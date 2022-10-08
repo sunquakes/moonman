@@ -2,6 +2,7 @@
 
 import { app, BrowserWindow } from 'electron'
 import '../renderer/store'
+import '../server/websocket'
 
 /**
  * Set `__static` path to static files in production
