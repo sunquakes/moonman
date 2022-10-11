@@ -1,27 +1,19 @@
 import { server as WebSocketServer } from 'websocket'
+import db from './sqlite3'
 let http = require('http')
 
-// const sqlite3 = require('sqlite3').verbose()
-// const db = new sqlite3.Database('../db/rpcman.db')
+db.serialize(() => {
+  const stmt = db.prepare('INSERT INTO lorem VALUES (?)')
+  for (let i = 0; i < 10; i++) {
+    stmt.run('Ipsum ' + i)
+  }
+  stmt.finalize()
 
-// db.serialize(() => {
-//   db.run('CREATE TABLE lorem (info TEXT)')
-
-//   const stmt = db.prepare('INSERT INTO lorem VALUES (?)')
-//   for (let i = 0; i < 10; i++) {
-//     stmt.run('Ipsum ' + i)
-//   }
-//   stmt.finalize()
-
-//   db.each('SELECT rowid AS id, info FROM lorem', (err, row) => {
-//     console.log(err)
-//     console.log(row.id + ': ' + row.info)
-//   })
-// })
-
-// db.close()
-
-console.log('test666', http)
+  db.each('SELECT rowid AS id, info FROM lorem', (err, row) => {
+    console.log(err)
+    console.log(row.id + ': ' + row.info)
+  })
+})
 
 let server = http.createServer(function (request, response) {
   console.log(new Date() + ' Received request for ' + request.url)
