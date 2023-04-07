@@ -22,16 +22,86 @@ db.serialize(() => {
       'update_time DATETIME' +
       ')'
   )
-  //   const stmt = db.prepare('INSERT INTO lorem VALUES (?)')
-  //   for (let i = 0; i < 10; i++) {
-  //     stmt.run('Ipsum ' + i)
-  //   }
-  //   stmt.finalize()
-
-  //   db.each('SELECT rowid AS id, info FROM lorem', (err, row) => {
-  //     console.log(err)
-  //     console.log(row.id + ': ' + row.info)
-  //   })
 })
+
+export function save(tableName, data) {
+  let fieldArray = []
+  let valueArray = []
+  for (let key in data) {
+    let value = data[key]
+    if (typeof value === 'string') {
+      value = `'${value}'`
+    }
+    fieldArray.push(key)
+    valueArray.push(value)
+  }
+  let fields = '(' + fieldArray.join(',') + ')'
+  let values = '(' + valueArray.join(',') + ')'
+  let sql = `INSERT INTO ${tableName} ${fields} VALUES ${values}`
+  return new Promise((resolve, reject) => {
+    db.run(sql, function (err) {
+      if (err != null) {
+        reject(err)
+      } else {
+        resolve(this.lastID)
+      }
+    })
+  })
+}
+
+export function updateById(tableName, id, data) {
+  let fieldArray = []
+  for (let key in data) {
+    let value = data[key]
+    if (typeof value === 'string') {
+      value = `'${value}'`
+    }
+    fieldArray.push(`${key} = ${value}`)
+  }
+  let fields = fieldArray.join(',')
+  let sql = `UPDATE ${tableName} SET ${fields} WHERE id = ${id}`
+  return new Promise((resolve, reject) => {
+    db.run(sql, function (err) {
+      if (err != null) {
+        reject(err)
+      } else {
+        resolve(this.lastID)
+      }
+    })
+  })
+}
+
+export function list(tableName, where) {
+  let sql = `SELECT * FROM ${tableName}`
+  if (where) {
+    let whereArray = []
+    for (let item of where) {
+      if (!(item instanceof Array)) continue
+      if (item.length === 2) {
+        let field = item[0]
+        let value = item[1]
+        whereArray.push(`${field} = ${value}`)
+      } else if (item.length === 3) {
+        let field = item[0]
+        let symbol = item[1]
+        let value = item[2]
+        whereArray.push(`${field} ${symbol} ${value}`)
+      }
+    }
+    if (whereArray.length > 0) {
+      let where = whereArray.join(' ')
+      sql = `${sql} WHERE ${where}`
+    }
+  }
+  return new Promise((resolve, reject) => {
+    db.all(sql, (err, rows) => {
+      if (err != null) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
+}
 
 export default db

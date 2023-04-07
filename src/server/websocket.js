@@ -1,17 +1,11 @@
 import { server as WebSocketServer } from 'websocket'
-import db from './sqlite3'
+import db, { save } from './sqlite3'
 let http = require('http')
 
 db.serialize(() => {
-  const stmt = db.prepare('INSERT INTO lorem VALUES (?)')
-  for (let i = 0; i < 10; i++) {
-    stmt.run('Ipsum ' + i)
-  }
-  stmt.finalize()
-
-  db.each('SELECT rowid AS id, info FROM lorem', (err, row) => {
-    console.log(err)
-    console.log(row.id + ': ' + row.info)
+  console.log('查看列表')
+  save('lorem', {info: 'test'}).then((res) => {
+    console.log('rows', res)
   })
 })
 

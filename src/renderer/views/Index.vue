@@ -1,57 +1,6 @@
 <template>
   <el-container>
-    <el-aside width="380px">
-      <div>
-        <el-input
-          placeholder="请输入内容"
-          v-model="input3"
-          class="input-with-select"
-        >
-          <template slot="prepend">tcp://</template>
-          <el-button slot="append" icon="el-icon-search"></el-button>
-          <el-button
-            slot="append"
-            icon="el-icon-plus"
-            @click="dialogFormVisible = true"
-          ></el-button>
-        </el-input>
-        <el-dialog
-          :title="$t('index.create_new_connect')"
-          :visible.sync="dialogFormVisible"
-        >
-          <el-form :model="form">
-            <el-form-item label="活动名称" :label-width="formLabelWidth">
-              <el-input
-                placeholder="请输入内容"
-                v-model="input3"
-                class="input-with-select"
-              >
-                <template slot="prepend">tcp://</template>
-              </el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false"
-              >确 定</el-button
-            >
-          </div>
-        </el-dialog>
-      </div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-      <div class="session">127.0.0.1:3200</div>
-    </el-aside>
+    <Sidebar></Sidebar>
     <el-container>
       <el-header>
         <el-input
@@ -107,40 +56,40 @@
 
 <script>
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
+import { save } from '../../server/sqlite3'
+import Sidebar from '../components/index/Sidebar.vue'
 export default {
   name: 'Index',
+  components: { Sidebar },
   data() {
     return {
-      dialogFormVisible: true
+      ws: undefined
     }
   },
   mounted() {
-    console.log('test123', 123)
-
-    let client = new W3CWebSocket('ws://localhost:8080/', 'echo-protocol')
-
-    client.onerror = function () {
+    console.log('666')
+    save('lorem', { info: 'test' }).then((res) => {
+      console.log('rows', res)
+    })
+    this.ws = new W3CWebSocket('ws://localhost:8080/', 'echo-protocol')
+    this.ws.onerror = function () {
       console.log('Connection Error')
     }
-
-    client.onopen = function () {
-      console.log('WebSocket Client Connected')
-
+    this.ws.onopen = function () {
+      console.log('WebSocket this.ws Connected')
       function sendNumber() {
-        if (client.readyState === client.OPEN) {
-          var number = Math.round(Math.random() * 0xffffff)
-          client.send(number.toString())
-          setTimeout(sendNumber, 1000)
-        }
+        // if (this.ws.readyState === this.ws.OPEN) {
+        //   var number = Math.round(Math.random() * 0xffffff)
+        //   this.ws.send(number.toString())
+        //   setTimeout(sendNumber, 1000)
+        // }
       }
       sendNumber()
     }
-
-    client.onclose = function () {
-      console.log('echo-protocol Client Closed')
+    this.ws.onclose = function () {
+      console.log('echo-protocol this.ws Closed')
     }
-
-    client.onmessage = function (e) {
+    this.ws.onmessage = function (e) {
       if (typeof e.data === 'string') {
         console.log("Received: '" + e.data + "'")
       }
@@ -153,13 +102,6 @@ export default {
 <style>
 .el-container {
   height: 100vh;
-}
-
-.el-aside {
-  width: 500 !important;
-  height: 100vh;
-  padding-bottom: 20px;
-  border-right: 1px solid rgba(191, 191, 191, 0.5);
 }
 
 .el-header {
