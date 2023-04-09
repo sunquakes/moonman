@@ -5,7 +5,8 @@ db.serialize(() => {
   db.run(
     'CREATE TABLE IF NOT EXISTS session (' +
       'id Integer PRIMARY KEY AUTOINCREMENT,' +
-      'address VARCHAR(255) NOT NULL DEFAULT "",' +
+      'ip VARCHAR(255) NOT NULL DEFAULT "",' +
+      'port Integer NOT NULL DEFAULT 80,' +
       'state Integer NOT NULL DEFAULT 0,' +
       'create_time DATETIME,' +
       'update_time DATETIME' +
@@ -80,16 +81,22 @@ export function list(tableName, where) {
       if (item.length === 2) {
         let field = item[0]
         let value = item[1]
+        if (typeof value === 'string') {
+          value = `'${value}'`
+        }
         whereArray.push(`${field} = ${value}`)
       } else if (item.length === 3) {
         let field = item[0]
         let symbol = item[1]
         let value = item[2]
+        if (typeof value === 'string') {
+          value = `'${value}'`
+        }
         whereArray.push(`${field} ${symbol} ${value}`)
       }
     }
     if (whereArray.length > 0) {
-      let where = whereArray.join(' ')
+      let where = whereArray.join(' AND ')
       sql = `${sql} WHERE ${where}`
     }
   }
@@ -99,6 +106,45 @@ export function list(tableName, where) {
         reject(err)
       } else {
         resolve(rows)
+      }
+    })
+  })
+}
+
+export function getOne(tableName, where) {
+  let sql = `SELECT * FROM ${tableName}`
+  if (where) {
+    let whereArray = []
+    for (let item of where) {
+      if (!(item instanceof Array)) continue
+      if (item.length === 2) {
+        let field = item[0]
+        let value = item[1]
+        if (typeof value === 'string') {
+          value = `'${value}'`
+        }
+        whereArray.push(`${field} = ${value}`)
+      } else if (item.length === 3) {
+        let field = item[0]
+        let symbol = item[1]
+        let value = item[2]
+        if (typeof value === 'string') {
+          value = `'${value}'`
+        }
+        whereArray.push(`${field} ${symbol} ${value}`)
+      }
+    }
+    if (whereArray.length > 0) {
+      let where = whereArray.join(' AND ')
+      sql = `${sql} WHERE ${where}`
+    }
+  }
+  return new Promise((resolve, reject) => {
+    db.get(sql, (err, row) => {
+      if (err != null) {
+        reject(err)
+      } else {
+        resolve(row)
       }
     })
   })

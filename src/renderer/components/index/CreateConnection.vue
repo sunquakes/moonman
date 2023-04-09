@@ -1,14 +1,22 @@
 <template>
-  <el-dialog :title="$t('index.create_new_connect')" :show-close="false" :visible="value">
+  <el-dialog
+    :title="$t('index.create_new_connect')"
+    :show-close="false"
+    :visible="value"
+  >
     <el-form :model="form">
-      <el-form-item label="活动名称">
-        <el-input
-          placeholder="请输入内容"
-          v-model="form.address"
-          class="input-with-select"
-        >
-          <template slot="prepend">tcp://</template>
-        </el-input>
+      <el-form-item>
+        <el-col :span="18">
+          <el-input
+            placeholder="ip"
+            v-model="form.ip"
+            class="input-with-select"
+          >
+          </el-input>
+        </el-col>
+        <el-col :offset="1" :span="5">
+          <el-input placeholder="port" v-model="form.port"></el-input>
+        </el-col>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -19,7 +27,8 @@
 </template>
 
 <script>
-import { save } from '../../../server/sqlite3'
+import { getOne, save } from '../../../server/sqlite3'
+const net = window.require('net')
 export default {
   name: 'CreateConnection',
   props: {
@@ -32,7 +41,8 @@ export default {
     return {
       dialogFormVisible: false,
       form: {
-        address: undefined
+        ip: undefined,
+        port: undefined
       }
     }
   },
@@ -41,8 +51,21 @@ export default {
       this.$emit('input', value)
     },
     submit() {
-      save('session', this.form).then((id) => {
-        this.$emit('onCreated', id)
+      getOne('session', [['ip', this.form.ip], ['port', this.form.port]]).then((row) => {
+        if (row) {
+          this.connect(row.id)
+        } else {
+          save('session', this.form).then((id) => {
+            this.connect(id)
+          })
+        }
+      })
+    },
+    connect(id) {
+      let client = new net.Socket()
+      client.connect(this.form.port, this.form.ip, () => {
+        client.on('close', () => {})
+        this.$emit('onCreate', id, client)
       })
     }
   }
@@ -50,10 +73,7 @@ export default {
 </script>
 
 <style scoped>
-.el-aside {
-  width: 500 !important;
-  height: 100vh;
-  padding-bottom: 20px;
-  border-right: 1px solid rgba(191, 191, 191, 0.5);
+/deep/ .el-dialog {
+  width: 400px;
 }
 </style>

@@ -14,9 +14,15 @@
           @click="dialogFormVisible = true"
         ></el-button>
       </el-input>
-      <CreateConnection v-model="dialogFormVisible"></CreateConnection>
+      <CreateConnection
+        v-model="dialogFormVisible"
+        @onCreate="onCreate"
+      ></CreateConnection>
     </div>
-    <div class="session" v-for="item in list">{{ item.address }}</div>
+    <div class="session" v-for="item in list">
+      {{ item.ip }}:{{ item.port }}
+      {{ !item.client ? 'abc' : item.client.readyState }}
+    </div>
   </el-aside>
 </template>
 
@@ -30,7 +36,8 @@ export default {
     return {
       dialogFormVisible: true,
       keyword: undefined,
-      list: []
+      list: [],
+      map: {}
     }
   },
   mounted() {
@@ -39,9 +46,15 @@ export default {
   methods: {
     getList() {
       list('session').then((list) => {
-        console.log(list)
+        for (let item of list) {
+          item.client = this.map[item.id]
+        }
         this.list = list
       })
+    },
+    onCreate(id, client) {
+      this.map[id] = client
+      this.getList()
     }
   }
 }
