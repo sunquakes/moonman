@@ -20,15 +20,16 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="show(false)">取 消</el-button>
-      <el-button type="primary" @click="submit">确 定</el-button>
+      <el-button @click="show(false)">{{ $t('common.cancel') }}</el-button>
+      <el-button type="primary" @click="submit">{{
+        $t('common.submit')
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
 import { getOne, save } from '../../../server/sqlite3'
-const net = window.require('net')
 export default {
   name: 'CreateConnection',
   props: {
@@ -51,22 +52,22 @@ export default {
       this.$emit('input', value)
     },
     submit() {
-      getOne('session', [['ip', this.form.ip], ['port', this.form.port]]).then((row) => {
+      getOne('session', [
+        ['ip', this.form.ip],
+        ['port', this.form.port]
+      ]).then((row) => {
         if (row) {
-          this.connect(row.id)
+          this.connect(row)
         } else {
           save('session', this.form).then((id) => {
-            this.connect(id)
+            this.form.id = id
+            this.connect(this.form)
           })
         }
       })
     },
-    connect(id) {
-      let client = new net.Socket()
-      client.connect(this.form.port, this.form.ip, () => {
-        client.on('close', () => {})
-        this.$emit('onCreate', id, client)
-      })
+    connect(data) {
+      this.$emit('afterCreate', data)
     }
   }
 }

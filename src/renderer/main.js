@@ -7,6 +7,7 @@ import store from './store'
 
 import ElementUI, { Message } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import 'font-awesome/css/font-awesome.min.css'
 import i18n from './i18n'
 Vue.use(ElementUI)
 

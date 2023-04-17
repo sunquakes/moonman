@@ -16,7 +16,7 @@
       </el-input>
       <CreateConnection
         v-model="dialogFormVisible"
-        @onCreate="onCreate"
+        @afterCreate="afterCreateSession"
       ></CreateConnection>
     </div>
     <div class="session-list" v-for="item in list">
@@ -28,7 +28,24 @@
         @click="selectSession(item)"
       >
         {{ item.ip }}:{{ item.port }}
-        {{ !item.client ? 'abc' : item.client.readyState }}
+        <el-tag
+          v-if="
+            map[item.id] !== undefined && map[item.id].readyState === 'open'
+          "
+          type="success"
+          effect="dark"
+          size="mini"
+          class="session-state"
+          >{{ $t('index.session_state_online') }}</el-tag
+        >
+        <el-tag
+          v-else
+          type="danger"
+          effect="dark"
+          size="mini"
+          class="session-state"
+          >{{ $t('index.session_state_offline') }}</el-tag
+        >
       </div>
     </div>
   </el-aside>
@@ -46,12 +63,21 @@ export default {
       default: undefined
     }
   },
+  watch: {
+    value(newVal) {
+      const id = newVal.id
+      this.map[id] = newVal.client
+      const index = this.indexMap[id]
+      this.list[index].client = this.map[id]
+    }
+  },
   data() {
     return {
       dialogFormVisible: true,
       keyword: undefined,
       list: [],
-      map: {}
+      map: {},
+      indexMap: {}
     }
   },
   mounted() {
@@ -60,15 +86,21 @@ export default {
   methods: {
     getList() {
       list('session').then((list) => {
-        for (let item of list) {
+        this.indexMap = {}
+        for (let index in list) {
+          let item = list[index]
           item.client = this.map[item.id]
+          this.indexMap[item.id] = Number(index)
         }
         this.list = list
       })
     },
-    onCreate(id, client) {
-      this.map[id] = client
-      this.getList()
+    afterCreateSession(session) {
+      console.log('session', session)
+      this.$emit('afterCreateSession', session, (client) => {
+        this.map[session.id] = client
+        this.getList()
+      })
     },
     selectSession(session) {
       this.$emit('input', session)
@@ -88,6 +120,10 @@ export default {
   padding: 20px 20px;
   border-bottom: 1px solid rgba(191, 191, 191, 0.5);
   cursor: pointer;
+}
+
+.session-state {
+  float: right;
 }
 .hover {
   background: rgba(191, 191, 191, 0.5);

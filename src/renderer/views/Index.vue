@@ -1,7 +1,10 @@
 <template>
   <el-container>
-    <Sidebar v-model="session"></Sidebar>
-    <Session v-model="session"></Session>
+    <Sidebar
+      v-model="session"
+      @afterCreateSession="afterCreateSession"
+    ></Sidebar>
+    <Session ref="Session" v-model="session"></Session>
   </el-container>
 </template>
 
@@ -16,9 +19,15 @@ export default {
       session: undefined
     }
   },
-  mounted() {
-  },
-  methods: {}
+  mounted() {},
+  methods: {
+    afterCreateSession(session, callback) {
+      this.session = session
+      this.$nextTick(() => {
+        this.$refs.Session.connect(callback)
+      })
+    }
+  }
 }
 </script>
 
