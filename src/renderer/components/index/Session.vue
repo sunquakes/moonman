@@ -1,14 +1,11 @@
 <template>
   <el-container>
     <el-header>
-      <el-input
-        v-model="value.ip + ':' + value.port"
-        class="input-with-select"
-        :disabled="true"
-      >
+      <el-input v-model="address" class="input-with-select" :disabled="true">
         <template slot="prepend">tcp://</template>
         <el-button
           v-if="
+            this.value !== undefined &&
             this.value.client !== undefined &&
             this.value.client.readyState == 'open'
           "
@@ -82,10 +79,18 @@ export default {
       default: undefined
     }
   },
+  watch: {
+    value(newVal) {
+      if (newVal !== undefined) {
+        this.address = newVal.ip + ':' + newVal.port
+      }
+    }
+  },
   data() {
     return {
       form: Object.assign({}, FORM),
-      list: []
+      list: [],
+      address: undefined
     }
   },
   mounted() {
@@ -95,50 +100,75 @@ export default {
     getList() {
       list('message', [['state', 1]]).then((list) => {
         this.list = list
+        this.$nextTick(() => {
+          let messages = this.$el.querySelector('#messages')
+          messages.scrollTop = messages.scrollHeight
+        })
       })
     },
     saveLocalMessage() {
-      this.saveMessage(this.form)
-        .then((data) => {
-          this.form.content = ''
+      console.log('saveLocalMessage')
+      if (!this.form.content) {
+        this.$message({
+          type: 'error',
+          message: this.$t('index.session_content_cannot_empty')
         })
-        .catch((error) => {
-          this.$message({
-            type: 'error',
-            message: error
-          })
+        return
+      }
+      if (
+        this.value === undefined ||
+        this.value.client === undefined ||
+        this.value.client.readyState !== 'open'
+      ) {
+        this.$message({
+          type: 'error',
+          message: this.$t('index.session_unconnected')
         })
-    },
-    saveMessage(data) {
-      return new Promise((resolve, reject) => {
-        if (
-          this.value === undefined ||
-          this.value.client === undefined ||
-          this.value.client.readyState !== 'open'
-        ) {
-          this.$message({
-            type: 'error',
-            message: this.$t('index.session_unconnected')
-          })
-        } else {
-          data.create_time = moment().format('YYYY-MM-DD HH:mm:ss')
-          data.session_id = this.value.id
-          save('message', data).then((id) => {
-            data.id = id
-            const message = Object.assign({}, data)
-            let res = this.value.client.write(message.content + '\r\n')
-            if (res === true) {
-              this.list.push(message)
-              this.$nextTick(() => {
-                let messages = this.$el.querySelector('#messages')
-                messages.scrollTop = messages.scrollHeight
-                resolve(message)
+      } else {
+        let res = this.value.client.write(this.form.content + '\r\n')
+        if (res === true) {
+          this.saveMessage(this.form)
+            .then((data) => {
+              this.form.content = ''
+            })
+            .catch((error) => {
+              this.$message({
+                type: 'error',
+                message: error
               })
-            } else {
-              reject(this.$t('index.session_send_message_fail'))
-            }
+            })
+        } else {
+          this.$message({
+            type: 'error',
+            message: this.$t('index.session_send_message_fail')
           })
         }
+      }
+    },
+    saveMessage(data) {
+      if (!data.content) {
+        this.$message({
+          type: 'error',
+          message: this.$t('index.session_content_cannot_empty')
+        })
+        return
+      }
+      return new Promise((resolve, reject) => {
+        data.create_time = moment().format('YYYY-MM-DD HH:mm:ss')
+        data.session_id = this.value.id
+        save('message', data)
+          .then((id) => {
+            console.log('id', id)
+            let message = Object.assign({}, data)
+            message.id = id
+            this.list.push(message)
+            this.$nextTick(() => {
+              let messages = this.$el.querySelector('#messages')
+              messages.scrollTop = messages.scrollHeight
+              resolve(message)
+            })
+          })
+          .catch((error) => reject(error))
       })
     },
     connect(callback) {
@@ -149,13 +179,7 @@ export default {
           let form = Object.assign({}, FORM)
           form.type = 1
           form.content = data.toString()
-          this.saveMessage(form).then((message) => {
-            this.list.push(message)
-            this.$nextTick(() => {
-              let messages = this.$el.querySelector('#messages')
-              messages.scrollTop = messages.scrollHeight
-            })
-          })
+          this.saveMessage(form)
         })
         let session = Object.assign({}, this.value)
         session.client = client

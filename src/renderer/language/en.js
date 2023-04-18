@@ -8,6 +8,7 @@ module.exports = {
     session_state_online: 'online',
     session_state_offline: 'offline',
     session_send_message_fail: 'Send failed',
-    session_unconnected: 'Session unconnected'
+    session_unconnected: 'Session unconnected',
+    session_content_cannot_empty: 'Content can not empty'
   }
 }

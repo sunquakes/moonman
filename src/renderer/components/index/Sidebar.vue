@@ -65,6 +65,7 @@ export default {
   },
   watch: {
     value(newVal) {
+      console.log('watch')
       const id = newVal.id
       this.map[id] = newVal.client
       const index = this.indexMap[id]
@@ -73,7 +74,7 @@ export default {
   },
   data() {
     return {
-      dialogFormVisible: true,
+      dialogFormVisible: false,
       keyword: undefined,
       list: [],
       map: {},
@@ -93,10 +94,13 @@ export default {
           this.indexMap[item.id] = Number(index)
         }
         this.list = list
+        if (this.value === undefined && this.list.length > 0) {
+          let session = this.list[0]
+          this.$emit('input', session)
+        }
       })
     },
     afterCreateSession(session) {
-      console.log('session', session)
       this.$emit('afterCreateSession', session, (client) => {
         this.map[session.id] = client
         this.getList()

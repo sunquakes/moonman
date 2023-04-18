@@ -24,6 +24,7 @@ export default {
     afterCreateSession(session, callback) {
       this.session = session
       this.$nextTick(() => {
+        console.log('connect')
         this.$refs.Session.connect(callback)
       })
     }
