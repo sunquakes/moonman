@@ -4,20 +4,22 @@
     :show-close="false"
     :visible="value"
   >
-    <el-form :model="form">
-      <el-form-item>
-        <el-col :span="18">
+    <el-form ref="form" :model="form" :rules="rules">
+      <el-col :span="16">
+        <el-form-item prop="ip">
           <el-input
             placeholder="ip"
             v-model="form.ip"
             class="input-with-select"
           >
           </el-input>
-        </el-col>
-        <el-col :offset="1" :span="5">
-          <el-input placeholder="port" v-model="form.port"></el-input>
-        </el-col>
-      </el-form-item>
+        </el-form-item>
+      </el-col>
+      <el-col :offset="1" :span="7">
+        <el-form-item prop="port">
+          <el-input placeholder="port" v-model.number="form.port"></el-input>
+        </el-form-item>
+      </el-col>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="show(false)">{{ $t('common.cancel') }}</el-button>
@@ -29,7 +31,6 @@
 </template>
 
 <script>
-import { getOne, save } from '../../../server/sqlite3'
 export default {
   name: 'CreateConnection',
   props: {
@@ -40,10 +41,26 @@ export default {
   },
   data() {
     return {
-      dialogFormVisible: false,
       form: {
         ip: undefined,
         port: undefined
+      },
+      rules: {
+        ip: [
+          {
+            required: true,
+            message: this.$t('index.form_ip_required'),
+            trigger: 'blur'
+          }
+        ],
+        port: [
+          {
+            required: true,
+            message: this.$t('index.form_port_required'),
+            trigger: 'blur'
+          },
+          { type: 'number', message: this.$t('index.form_port_type') }
+        ]
       }
     }
   },
@@ -52,17 +69,11 @@ export default {
       this.$emit('input', value)
     },
     submit() {
-      getOne('session', [
-        ['ip', this.form.ip],
-        ['port', this.form.port]
-      ]).then((row) => {
-        if (row) {
-          this.connect(row)
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.connect(this.form)
         } else {
-          save('session', this.form).then((id) => {
-            this.form.id = id
-            this.connect(this.form)
-          })
+          return false
         }
       })
     },

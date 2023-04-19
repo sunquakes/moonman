@@ -22,10 +22,8 @@ export default {
   mounted() {},
   methods: {
     afterCreateSession(session, callback) {
-      this.session = session
       this.$nextTick(() => {
-        console.log('connect')
-        this.$refs.Session.connect(callback)
+        this.$refs.Session.connect(session.ip, session.port, callback)
       })
     }
   }

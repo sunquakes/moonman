@@ -65,7 +65,6 @@ export default {
   },
   watch: {
     value(newVal) {
-      console.log('watch')
       const id = newVal.id
       this.map[id] = newVal.client
       const index = this.indexMap[id]
@@ -102,12 +101,20 @@ export default {
     },
     afterCreateSession(session) {
       this.$emit('afterCreateSession', session, (client) => {
+        if (this.map[session.id] !== undefined) {
+          this.map[session.id].destroy()
+          this.map[session.id] = undefined
+        }
         this.map[session.id] = client
         this.getList()
+        this.closeCreateConnection()
       })
     },
     selectSession(session) {
       this.$emit('input', session)
+    },
+    closeCreateConnection() {
+      this.dialogFormVisible = false
     }
   }
 }

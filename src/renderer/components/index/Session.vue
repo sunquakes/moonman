@@ -12,10 +12,17 @@
           class="chain-broken"
           slot="append"
           @click="close"
+          :disabled="value === undefined ? true : false"
         >
           <i class="fa fa-chain-broken fa-lg"></i>
         </el-button>
-        <el-button v-else class="chain" slot="append" @click="reconnect">
+        <el-button
+          v-else
+          class="chain"
+          slot="append"
+          @click="reconnect"
+          :disabled="value === undefined ? true : false"
+        >
           <i class="fa fa-chain fa-lg"></i>
         </el-button>
       </el-input>
@@ -49,8 +56,11 @@
       </el-row>
       <el-row>
         <el-col :offset="18" :span="6" class="right">
-          <el-button type="primary" @click="saveLocalMessage"
-            >主要按钮</el-button
+          <el-button
+            type="primary"
+            @click="saveLocalMessage"
+            :disabled="value === undefined ? true : false"
+            >{{ $t('index.session_send_message') }}</el-button
           >
         </el-col>
       </el-row>
@@ -59,7 +69,7 @@
 </template>
 
 <script>
-import { list, save } from '../../../server/sqlite3'
+import { list, save, getOne } from '../../../server/sqlite3'
 import moment from 'moment'
 const net = window.require('net')
 
@@ -83,6 +93,7 @@ export default {
     value(newVal) {
       if (newVal !== undefined) {
         this.address = newVal.ip + ':' + newVal.port
+        this.getList()
       }
     }
   },
@@ -98,16 +109,27 @@ export default {
   },
   methods: {
     getList() {
-      list('message', [['state', 1]]).then((list) => {
-        this.list = list
-        this.$nextTick(() => {
-          let messages = this.$el.querySelector('#messages')
-          messages.scrollTop = messages.scrollHeight
+      if (this.value !== undefined) {
+        list('message', [
+          ['state', 1],
+          ['session_id', this.value.id]
+        ]).then((list) => {
+          this.list = list
+          this.$nextTick(() => {
+            let messages = this.$el.querySelector('#messages')
+            messages.scrollTop = messages.scrollHeight
+          })
         })
-      })
+      }
     },
     saveLocalMessage() {
-      console.log('saveLocalMessage')
+      if (this.value === undefined) {
+        this.$message({
+          type: 'error',
+          message: this.$t('index.create_session_first')
+        })
+        return
+      }
       if (!this.form.content) {
         this.$message({
           type: 'error',
@@ -171,15 +193,23 @@ export default {
           .catch((error) => reject(error))
       })
     },
-    connect(callback) {
+    connect(ip, port, callback) {
       let client = new net.Socket()
-      client.connect(this.value.port, this.value.ip, () => {
+      client.connect(port, ip, () => {
         client.on('close', () => {})
         client.on('data', (data) => {
           let form = Object.assign({}, FORM)
           form.type = 1
           form.content = data.toString()
           this.saveMessage(form)
+        })
+        getOne('session', [
+          ['ip', ip],
+          ['port', port]
+        ]).then((row) => {
+          if (!row) {
+            save('session', { port: port, ip: ip })
+          }
         })
         let session = Object.assign({}, this.value)
         session.client = client
@@ -190,7 +220,16 @@ export default {
       })
     },
     reconnect() {
-      this.connect()
+      if (this.value === undefined) {
+        this.$message({
+          type: 'error',
+          message: this.$t('index.create_session_first')
+        })
+        return
+      }
+      const ip = this.value.ip
+      const port = this.value.port
+      this.connect(ip, port)
     },
     close() {
       this.value.client.destroy()
@@ -215,11 +254,16 @@ export default {
 }
 
 .el-header {
+  height: 40px !important;
   padding: 0 0 !important;
 }
 
 .el-main {
   height: 100vh;
+  overflow-y: hidden !important;
+}
+::-webkit-scrollbar {
+  display: none !important; /* Chrome Safari 兼容*/
 }
 
 .el-footer {
