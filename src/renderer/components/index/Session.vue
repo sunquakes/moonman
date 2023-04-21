@@ -55,7 +55,31 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col :offset="18" :span="6" class="right">
+        <el-col v-if="value !== undefined" :span="18">
+          <el-form v-model="value" label-width="80px">
+            <el-row class="session-config">
+              <el-col :span="8">
+                <el-form-item :label="$t('index.session_delimiter')">
+                  <el-input v-model="value.delimiter"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="16">
+                <el-form-item>
+                  <el-radio v-model="value.message_type" label="hex" border>{{
+                    $t('index.session_message_type_hex')
+                  }}</el-radio>
+                  <el-radio
+                    v-model="value.message_type"
+                    label="string"
+                    border
+                    >{{ $t('index.session_message_type_string') }}</el-radio
+                  >
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-col>
+        <el-col :offset="value === undefined ? 18 : 0" :span="6" class="right">
           <el-button
             type="primary"
             @click="saveLocalMessage"
@@ -69,7 +93,7 @@
 </template>
 
 <script>
-import { list, save, getOne } from '../../../server/sqlite3'
+import { list, save, updateById, getOne } from '../../../server/sqlite3'
 import moment from 'moment'
 const net = window.require('net')
 
@@ -208,15 +232,37 @@ export default {
           ['port', port]
         ]).then((row) => {
           if (!row) {
-            save('session', { port: port, ip: ip })
+            let session = {
+              port: port,
+              ip: ip,
+              delimiter: '\r\n',
+              message_type: 'string',
+              create_time: moment().format('YYYY-MM-DD HH:mm:ss')
+            }
+            save('session', session).then((id) => {
+              session.id = id
+              session.client = client
+              this.$emit('input', session)
+              this.$nextTick(() => {
+                if (callback !== undefined) {
+                  callback(client)
+                }
+              })
+            })
+          } else {
+            let session = Object.assign({}, row)
+            session.update_time = moment().format('YYYY-MM-DD HH:mm:ss')
+            updateById('session', row.id, session).then((id) => {
+              session.client = client
+              this.$emit('input', session)
+              this.$nextTick(() => {
+                if (callback !== undefined) {
+                  callback(client)
+                }
+              })
+            })
           }
         })
-        let session = Object.assign({}, this.value)
-        session.client = client
-        this.$emit('input', session)
-        if (callback !== undefined) {
-          callback(client)
-        }
       })
     },
     reconnect() {
@@ -328,5 +374,9 @@ export default {
 #messages {
   overflow-y: scroll;
   height: 100%;
+}
+
+.session-config {
+  margin-top: 0px !important;
 }
 </style>

@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose()
-const db = new sqlite3.Database('db/rpcman.db')
+const db = new sqlite3.Database('db/moonman.db')
 
 db.serialize(() => {
   db.run(
@@ -8,6 +8,8 @@ db.serialize(() => {
       'ip VARCHAR(255) NOT NULL DEFAULT "",' +
       'port Integer NOT NULL DEFAULT 80,' +
       'state Integer NOT NULL DEFAULT 0,' +
+      'delimiter VARCHAR(255) NOT NULL DEFAULT "",' +
+      'message_type VARCHAR(20) NOT NULL DEFAULT "",' +
       'create_time DATETIME,' +
       'update_time DATETIME' +
       ')'
@@ -72,7 +74,7 @@ export function updateById(tableName, id, data) {
   })
 }
 
-export function list(tableName, where) {
+export function list(tableName, where, orderBy) {
   let sql = `SELECT * FROM ${tableName}`
   if (where) {
     let whereArray = []
@@ -99,6 +101,9 @@ export function list(tableName, where) {
       let where = whereArray.join(' AND ')
       sql = `${sql} WHERE ${where}`
     }
+  }
+  if (orderBy) {
+    sql = `${sql} ORDER BY ${orderBy}`
   }
   return new Promise((resolve, reject) => {
     db.all(sql, (err, rows) => {

@@ -1,4 +1,4 @@
-# rpcman
+# moonman
 
 > A tcp desktop client🚀
 

@@ -15,6 +15,10 @@ module.exports = {
     form_ip_required: 'Ip is required.',
     form_port_required: 'Port is required.',
     form_port_type: 'Port must be number.',
-    form_port_length_rule: 'Port must be 0-65535.'
+    form_port_length_rule: 'Port must be 0-65535.',
+    session_delimiter: 'Delimiter',
+    session_message_type: 'Message Format',
+    session_message_type_hex: 'Hex',
+    session_message_type_string: 'String'
   }
 }

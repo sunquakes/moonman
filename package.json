@@ -1,5 +1,5 @@
 {
-  "name": "rpcman",
+  "name": "moonman",
   "version": "0.0.1",
   "author": "Robert <sunquakes@outlook.com>",
   "description": "A tcp desktop client🚀",
@@ -23,8 +23,8 @@
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
   "build": {
-    "productName": "rpcman",
-    "appId": "com.sunquakes.rpcman",
+    "productName": "moonman",
+    "appId": "com.sunquakes.moonman",
     "directories": {
       "output": "build"
     },

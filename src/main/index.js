@@ -25,9 +25,9 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: 700,
     useContentSize: true,
-    width: 1000,
+    width: 1200,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -37,6 +37,7 @@ function createWindow() {
   })
 
   mainWindow.loadURL(winURL)
+  mainWindow.setMinimumSize(1200, 700)
 
   mainWindow.on('closed', () => {
     mainWindow = null

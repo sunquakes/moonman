@@ -8,16 +8,16 @@
       >
         <template slot="prepend">tcp://</template>
         <el-button slot="append" icon="el-icon-search"></el-button>
-        <el-button
-          slot="append"
-          icon="el-icon-plus"
-          @click="dialogFormVisible = true"
-        ></el-button>
       </el-input>
       <CreateConnection
         v-model="dialogFormVisible"
         @afterCreate="afterCreateSession"
       ></CreateConnection>
+    </div>
+    <div class="session-create">
+      <el-button type="primary" round @click="dialogFormVisible = true">{{
+        $t('index.create_new_connect')
+      }}</el-button>
     </div>
     <div class="session-list" v-for="item in list">
       <div
@@ -66,9 +66,13 @@ export default {
   watch: {
     value(newVal) {
       const id = newVal.id
+      console.log('id', id)
       this.map[id] = newVal.client
+      console.log('map', this.map)
       const index = this.indexMap[id]
-      this.list[index].client = this.map[id]
+      if (this.list[index] !== undefined) {
+        this.list[index].client = this.map[id]
+      }
     }
   },
   data() {
@@ -85,7 +89,7 @@ export default {
   },
   methods: {
     getList() {
-      list('session').then((list) => {
+      list('session', undefined, 'update_time DESC').then((list) => {
         this.indexMap = {}
         for (let index in list) {
           let item = list[index]
@@ -105,7 +109,6 @@ export default {
           this.map[session.id].destroy()
           this.map[session.id] = undefined
         }
-        this.map[session.id] = client
         this.getList()
         this.closeCreateConnection()
       })
@@ -126,6 +129,19 @@ export default {
   height: 100vh;
   padding-bottom: 20px;
   border-right: 1px solid rgba(191, 191, 191, 0.5);
+}
+
+.session-create {
+  text-align: center;
+  padding: 10px 10px;
+}
+
+.session-create .el-button {
+  width: 80%;
+}
+
+.session-list {
+  border-top: 1px solid rgba(191, 191, 191, 0.5);
 }
 .session-item {
   padding: 20px 20px;

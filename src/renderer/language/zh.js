@@ -15,6 +15,10 @@ module.exports = {
     form_ip_required: '请输入ip',
     form_port_required: '请输入port',
     form_port_type: 'port必须数字',
-    form_port_length_rule: 'port范围0-65535'
+    form_port_length_rule: 'port范围0-65535',
+    session_delimiter: '分隔符',
+    session_message_type: '消息格式',
+    session_message_type_hex: '16进制',
+    session_message_type_string: '字符串'
   }
 }
