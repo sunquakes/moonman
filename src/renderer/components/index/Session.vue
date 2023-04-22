@@ -60,18 +60,26 @@
             <el-row class="session-config">
               <el-col :span="8">
                 <el-form-item :label="$t('index.session_delimiter')">
-                  <el-input v-model="value.delimiter"></el-input>
+                  <el-input
+                    v-model="value.delimiter"
+                    @input="updateSession"
+                  ></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="16">
                 <el-form-item>
-                  <el-radio v-model="value.message_type" label="hex" border>{{
-                    $t('index.session_message_type_hex')
-                  }}</el-radio>
+                  <el-radio
+                    v-model="value.message_type"
+                    label="hex"
+                    border
+                    @input="updateSession"
+                    >{{ $t('index.session_message_type_hex') }}</el-radio
+                  >
                   <el-radio
                     v-model="value.message_type"
                     label="string"
                     border
+                    @input="updateSession"
                     >{{ $t('index.session_message_type_string') }}</el-radio
                   >
                 </el-form-item>
@@ -171,7 +179,18 @@ export default {
           message: this.$t('index.session_unconnected')
         })
       } else {
-        let res = this.value.client.write(this.form.content + '\r\n')
+        let msg
+        if (this.value.message_type === 'hex') {
+          const hexString =
+            this.form.content +
+            JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+          msg = Buffer.from(hexString, 'hex')
+        } else {
+          msg =
+            this.form.content +
+            JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+        }
+        let res = this.value.client.write(msg)
         if (res === true) {
           this.saveMessage(this.form)
             .then((data) => {
@@ -204,7 +223,6 @@ export default {
         data.session_id = this.value.id
         save('message', data)
           .then((id) => {
-            console.log('id', id)
             let message = Object.assign({}, data)
             message.id = id
             this.list.push(message)
@@ -235,7 +253,7 @@ export default {
             let session = {
               port: port,
               ip: ip,
-              delimiter: '\r\n',
+              delimiter: '\\r\\n',
               message_type: 'string',
               create_time: moment().format('YYYY-MM-DD HH:mm:ss')
             }
@@ -279,6 +297,12 @@ export default {
     },
     close() {
       this.value.client.destroy()
+    },
+    updateSession() {
+      updateById('session', this.value.id, {
+        delimiter: this.value.delimiter,
+        message_type: this.value.message_type
+      }).then((id) => {})
     }
   }
 }

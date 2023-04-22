@@ -7,7 +7,7 @@
         class="input-with-select"
       >
         <template slot="prepend">tcp://</template>
-        <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-button slot="append" icon="el-icon-search" @click="getList"></el-button>
       </el-input>
       <CreateConnection
         v-model="dialogFormVisible"
@@ -15,7 +15,7 @@
       ></CreateConnection>
     </div>
     <div class="session-create">
-      <el-button type="primary" round @click="dialogFormVisible = true">{{
+      <el-button type="primary" round icon="el-icon-plus" @click="dialogFormVisible = true">{{
         $t('index.create_new_connect')
       }}</el-button>
     </div>
@@ -89,7 +89,11 @@ export default {
   },
   methods: {
     getList() {
-      list('session', undefined, 'update_time DESC').then((list) => {
+      let where
+      if (this.keyword) {
+        where = [[`(ip || ':' || port)`, 'LIKE', `%${this.keyword}%`]]
+      }
+      list('session', where, 'update_time DESC').then((list) => {
         this.indexMap = {}
         for (let index in list) {
           let item = list[index]
