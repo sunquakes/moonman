@@ -1,5 +1,10 @@
+const path = require('path')
 const sqlite3 = require('sqlite3').verbose()
-const db = new sqlite3.Database('db/moonman.db')
+const dbFile =
+  process.env.NODE_ENV === 'development'
+    ? path.join(__dirname, './moonman.db')
+    : path.join(process.resourcesPath, './moonman.db')
+const db = new sqlite3.Database(dbFile)
 
 db.serialize(() => {
   db.run(
