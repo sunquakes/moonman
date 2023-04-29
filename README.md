@@ -1,10 +1,15 @@
 # moonman
 
-> A tcp desktop client🚀
+<p align="center"><a href="https://moonquakes.io/" target="_blank" rel="noopener noreferrer"><img width="200" src="https://www.moonquakes.io/images/logo.png" alt="moonquakes logo"></a></p>
+<p align="center">
+    <img src="https://img.shields.io/badge/node-%3E=14.20.0-brightgreen.svg?maxAge=2592000" alt="Node">
+    <img alt="GitHub" src="https://img.shields.io/github/license/sunquakes/moonquakes?color=blue">
+    <img alt="moonman" src="https://img.shields.io/github/v/release/sunquakes/moonman?display_name=moonman">
+</p>
 
-#### Build Setup
+## Build Setup
 
-``` bash
+```bash
 # install dependencies
 npm install
 
@@ -25,4 +30,5 @@ npm run lint
 
 ---
 
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[8d4ed60](https://github.com/SimulatedGREG/electron-vue/tree/8d4ed607d65300381a8f47d97923eb07832b1a9a) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+## License
+Source code in `moonman` is available under the [Apache-2.0 license](/LICENSE).
