@@ -2,7 +2,6 @@
 
 import { app, BrowserWindow } from 'electron'
 import '../renderer/store'
-import '../server/websocket'
 
 /**
  * Set `__static` path to static files in production
@@ -42,6 +41,7 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+  mainWindow.webContents.openDevTools() // Open dev-tools
 }
 
 app.on('ready', createWindow)

@@ -31,7 +31,9 @@
       "output": "build"
     },
     "files": [
-      "dist/electron/**/*",
+      "dist/electron/**/*"
+    ],
+    "extraResources": [
       "./moonman.db"
     ],
     "dmg": {

@@ -1,36 +1,51 @@
 const path = require('path')
 const sqlite3 = require('sqlite3').verbose()
-const dbFile =
-  process.env.NODE_ENV === 'development'
-    ? path.join(__dirname, './moonman.db')
-    : path.join(process.resourcesPath, './moonman.db')
-const db = new sqlite3.Database(dbFile)
+const dbFile = path.join(process.resourcesPath, 'moonman.db')
+let db
 
-db.serialize(() => {
-  db.run(
-    'CREATE TABLE IF NOT EXISTS session (' +
-      'id Integer PRIMARY KEY AUTOINCREMENT,' +
-      'ip VARCHAR(255) NOT NULL DEFAULT "",' +
-      'port Integer NOT NULL DEFAULT 80,' +
-      'state Integer NOT NULL DEFAULT 0,' +
-      'delimiter VARCHAR(255) NOT NULL DEFAULT "",' +
-      'message_type VARCHAR(20) NOT NULL DEFAULT "",' +
-      'create_time DATETIME,' +
-      'update_time DATETIME' +
-      ')'
-  )
-  db.run(
-    'CREATE TABLE IF NOT EXISTS message (' +
-      'id Integer PRIMARY KEY AUTOINCREMENT,' +
-      'session_id Integer NOT NULL,' +
-      'type Integer NOT NULL DEFAULT 0,' +
-      'state Integer NOT NULL DEFAULT 0,' +
-      'content TEXT,' +
-      'create_time DATETIME,' +
-      'update_time DATETIME' +
-      ')'
-  )
-})
+const getDb = () => {
+  return new Promise((resolve, reject) => {
+    if (db !== undefined) {
+      resolve(db)
+    } else {
+      db = new sqlite3.Database(dbFile, (err) => {
+        if (err !== null) {
+          console.error(err)
+          db = new sqlite3.Database(':memory:')
+        }
+        createTable()
+      })
+      const createTable = () => {
+        db.serialize(() => {
+          db.run(
+            'CREATE TABLE IF NOT EXISTS session (' +
+              'id Integer PRIMARY KEY AUTOINCREMENT,' +
+              'ip VARCHAR(255) NOT NULL DEFAULT "",' +
+              'port Integer NOT NULL DEFAULT 80,' +
+              'state Integer NOT NULL DEFAULT 0,' +
+              'delimiter VARCHAR(255) NOT NULL DEFAULT "",' +
+              'message_type VARCHAR(20) NOT NULL DEFAULT "",' +
+              'create_time DATETIME,' +
+              'update_time DATETIME' +
+              ')'
+          )
+          db.run(
+            'CREATE TABLE IF NOT EXISTS message (' +
+              'id Integer PRIMARY KEY AUTOINCREMENT,' +
+              'session_id Integer NOT NULL,' +
+              'type Integer NOT NULL DEFAULT 0,' +
+              'state Integer NOT NULL DEFAULT 0,' +
+              'content TEXT,' +
+              'create_time DATETIME,' +
+              'update_time DATETIME' +
+              ')',
+            () => resolve(db)
+          )
+        })
+      }
+    }
+  })
+}
 
 export function save(tableName, data) {
   let fieldArray = []
@@ -46,13 +61,15 @@ export function save(tableName, data) {
   let fields = '(' + fieldArray.join(',') + ')'
   let values = '(' + valueArray.join(',') + ')'
   let sql = `INSERT INTO ${tableName} ${fields} VALUES ${values}`
-  return new Promise((resolve, reject) => {
-    db.run(sql, function (err) {
-      if (err != null) {
-        reject(err)
-      } else {
-        resolve(this.lastID)
-      }
+  return getDb().then((db) => {
+    return new Promise((resolve, reject) => {
+      db.run(sql, function (err) {
+        if (err != null) {
+          reject(err)
+        } else {
+          resolve(this.lastID)
+        }
+      })
     })
   })
 }
@@ -68,13 +85,15 @@ export function updateById(tableName, id, data) {
   }
   let fields = fieldArray.join(',')
   let sql = `UPDATE ${tableName} SET ${fields} WHERE id = ${id}`
-  return new Promise((resolve, reject) => {
-    db.run(sql, function (err) {
-      if (err != null) {
-        reject(err)
-      } else {
-        resolve(this.lastID)
-      }
+  return getDb().then((db) => {
+    return new Promise((resolve, reject) => {
+      db.run(sql, function (err) {
+        if (err != null) {
+          reject(err)
+        } else {
+          resolve(this.lastID)
+        }
+      })
     })
   })
 }
@@ -110,13 +129,15 @@ export function list(tableName, where, orderBy) {
   if (orderBy) {
     sql = `${sql} ORDER BY ${orderBy}`
   }
-  return new Promise((resolve, reject) => {
-    db.all(sql, (err, rows) => {
-      if (err != null) {
-        reject(err)
-      } else {
-        resolve(rows)
-      }
+  return getDb().then((db) => {
+    return new Promise((resolve, reject) => {
+      db.all(sql, (err, rows) => {
+        if (err != null) {
+          reject(err)
+        } else {
+          resolve(rows)
+        }
+      })
     })
   })
 }
@@ -149,15 +170,17 @@ export function getOne(tableName, where) {
       sql = `${sql} WHERE ${where}`
     }
   }
-  return new Promise((resolve, reject) => {
-    db.get(sql, (err, row) => {
-      if (err != null) {
-        reject(err)
-      } else {
-        resolve(row)
-      }
+  return getDb().then((db) => {
+    return new Promise((resolve, reject) => {
+      db.get(sql, (err, row) => {
+        if (err != null) {
+          reject(err)
+        } else {
+          resolve(row)
+        }
+      })
     })
   })
 }
 
-export default db
+export default getDb
