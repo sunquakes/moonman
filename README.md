@@ -7,6 +7,9 @@
     <img alt="moonman" src="https://img.shields.io/github/v/release/sunquakes/moonman?display_name=moonman">
 </p>
 
+## Download
+[v0.0.1](https://github.com/sunquakes/moonman/releases/tag/v0.0.1)
+
 ## Build Setup
 
 ```bash
@@ -27,8 +30,6 @@ npm test
 npm run lint
 
 ```
-
----
 
 ## License
 Source code in `moonman` is available under the [Apache-2.0 license](/LICENSE).
