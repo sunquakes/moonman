@@ -1,10 +1,10 @@
-# moonman
+# Moonman
 
 <p align="center"><a href="https://moonquakes.io/" target="_blank" rel="noopener noreferrer"><img width="200" src="https://www.moonquakes.io/images/logo.png" alt="moonquakes logo"></a></p>
 <p align="center">
     <img src="https://img.shields.io/badge/node-%3E=14.20.0-brightgreen.svg?maxAge=2592000" alt="Node">
     <img alt="GitHub" src="https://img.shields.io/github/license/sunquakes/moonquakes?color=blue">
-    <img alt="moonman" src="https://img.shields.io/github/v/release/sunquakes/moonman">
+    <img alt="Moonman" src="https://img.shields.io/github/v/release/sunquakes/moonman">
 </p>
 
 ## Introduce
