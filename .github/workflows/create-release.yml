@@ -10,9 +10,6 @@ jobs:
 
     runs-on: ${{matrix.os}}
 
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest] 
@@ -38,6 +35,8 @@ jobs:
       run: yarn
     - name: Build
       run: yarn build
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
     - name: Upload file
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v2
@@ -49,6 +48,8 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
     - name: Release
       if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
@@ -59,3 +60,5 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
