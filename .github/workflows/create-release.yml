@@ -20,9 +20,6 @@ jobs:
       pages: write
       id-token: write
 
-    env:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -37,10 +34,14 @@ jobs:
     - name: Install 
       run: yarn
     - name: Build
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: yarn build
     - name: Upload file
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v2
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
         name: ${{ matrix.os }}
         path: |
@@ -59,3 +60,9 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
+        tag_name: v0.0.1
+        release_name: Release 0.0.1
+        body: |
+          ## Feature
+          - Tcp client.
+        token: ${{ secrets.GH_TOKEN }}
