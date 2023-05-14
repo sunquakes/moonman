@@ -20,6 +20,9 @@ jobs:
       pages: write
       id-token: write
 
+    env:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -35,8 +38,6 @@ jobs:
       run: yarn
     - name: Build
       run: yarn build
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
     - name: Upload file
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v2
@@ -48,8 +49,6 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
     - name: Release
       if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
@@ -60,5 +59,3 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
