@@ -10,6 +10,9 @@ jobs:
 
     runs-on: ${{matrix.os}}
 
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest] 
@@ -46,8 +49,6 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Release
       if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
@@ -58,5 +59,3 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
