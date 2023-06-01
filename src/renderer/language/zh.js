@@ -19,6 +19,8 @@ module.exports = {
     session_delimiter: '分隔符',
     session_message_type: '消息格式',
     session_message_type_hex: '16进制',
-    session_message_type_string: '字符串'
+    session_message_type_string: '字符串',
+    menu_client_name: '客户端',
+    menu_server_name: '服务端'
   }
 }

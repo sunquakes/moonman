@@ -1,5 +1,6 @@
 <template>
   <el-container>
+    <Menu></Menu>
     <Sidebar
       v-model="session"
       @afterCreateSession="afterCreateSession"
@@ -11,9 +12,10 @@
 <script>
 import Sidebar from '../components/index/Sidebar.vue'
 import Session from '../components/index/Session.vue'
+import Menu from '../components/index/Menu.vue'
 export default {
   name: 'Index',
-  components: { Sidebar, Session },
+  components: { Sidebar, Session, Menu },
   data() {
     return {
       session: undefined

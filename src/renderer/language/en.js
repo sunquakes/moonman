@@ -19,6 +19,8 @@ module.exports = {
     session_delimiter: 'Delimiter',
     session_message_type: 'Message Format',
     session_message_type_hex: 'Hex',
-    session_message_type_string: 'String'
+    session_message_type_string: 'String',
+    menu_client_name: 'Client',
+    menu_server_name: 'Server'
   }
 }
