@@ -1,23 +1,36 @@
 <template>
   <el-container>
-    <Menu></Menu>
-    <Sidebar
+    <Menu v-model="menu"></Menu>
+    <ClientSidebar
+      v-show="menu == CLIENT"
       v-model="session"
       @afterCreateSession="afterCreateSession"
-    ></Sidebar>
-    <Session ref="Session" v-model="session"></Session>
+    ></ClientSidebar>
+    <ClientSession v-show="menu == CLIENT" ref="Session" v-model="session"></ClientSession>
+    <ServerSidebar
+      v-show="menu == SERVER"
+      v-model="session"
+      @afterCreateSession="afterCreateSession"
+    ></ServerSidebar>
+    <ServerSession v-show="menu == SERVER" ref="Session" v-model="session"></ServerSession>
   </el-container>
 </template>
 
 <script>
-import Sidebar from '../components/index/Sidebar.vue'
-import Session from '../components/index/Session.vue'
+import ClientSidebar from '../components/client/Sidebar.vue'
+import ClientSession from '../components/client/Session.vue'
+import ServerSidebar from '../components/server/Sidebar.vue'
+import ServerSession from '../components/server/Session.vue'
 import Menu from '../components/index/Menu.vue'
+import { CLIENT, SERVER } from '../const/menu'
 export default {
   name: 'Index',
-  components: { Sidebar, Session, Menu },
+  components: { ClientSidebar, ClientSession, ServerSidebar, ServerSession, Menu },
   data() {
     return {
+      CLIENT,
+      SERVER,
+      menu: CLIENT,
       session: undefined
     }
   },
