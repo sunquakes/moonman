@@ -1,17 +1,9 @@
 <template>
-  <el-dialog
-    :title="$t('index.create_new_connect')"
-    :show-close="false"
-    :visible="value"
-  >
+  <el-dialog :title="$t('index.create_new_connect')" :show-close="false" :visible="value">
     <el-form ref="form" :model="form" :rules="rules">
       <el-col :span="16">
         <el-form-item prop="ip">
-          <el-input
-            placeholder="ip"
-            v-model="form.ip"
-            class="input-with-select"
-          >
+          <el-input placeholder="ip" v-model="form.ip" class="input-with-select" :readonly="true" :disabled="true">
           </el-input>
         </el-form-item>
       </el-col>
@@ -31,8 +23,9 @@
 </template>
 
 <script>
+import { SERVER_IP_DEFAULT } from '../../const/session'
 export default {
-  name: 'CreateConnection',
+  name: 'Create',
   props: {
     value: {
       type: Boolean,
@@ -42,7 +35,7 @@ export default {
   data() {
     return {
       form: {
-        ip: undefined,
+        ip: SERVER_IP_DEFAULT,
         port: undefined
       },
       rules: {
@@ -71,13 +64,13 @@ export default {
     submit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.connect(this.form)
+          this.listen(this.form)
         } else {
           return false
         }
       })
     },
-    connect(data) {
+    listen(data) {
       this.$emit('afterCreate', data)
     }
   }

@@ -1,11 +1,11 @@
 <template>
   <el-menu :default-active="value" class="el-menu-vertical-demo" :collapse="isCollapse" @select="handleSelect">
     <el-menu-item index="client" :title="$t('index.menu_client_name')">
-      <i class="fa fa-user fa-lg"></i>
+      <i class="fa fa-desktop fa-lg"></i>
       <span slot="title">{{ $t('index.menu_client_name') }}</span>
     </el-menu-item>
     <el-menu-item index="server" :title="$t('index.menu_server_name')">
-      <i class="fa fa-users fa-lg"></i>
+      <i class="fa fa-sitemap fa-lg"></i>
       <span slot="title">{{ $t('index.menu_server_name') }}</span>
     </el-menu-item>
   </el-menu>

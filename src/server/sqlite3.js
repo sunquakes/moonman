@@ -23,6 +23,7 @@ const getDb = () => {
               'ip VARCHAR(255) NOT NULL DEFAULT "",' +
               'port Integer NOT NULL DEFAULT 80,' +
               'state Integer NOT NULL DEFAULT 0,' +
+              'type Integer NOT NULL DEFAULT 0,' +
               'delimiter VARCHAR(255) NOT NULL DEFAULT "",' +
               'message_type VARCHAR(20) NOT NULL DEFAULT "",' +
               'create_time DATETIME,' +
@@ -36,6 +37,8 @@ const getDb = () => {
               'type Integer NOT NULL DEFAULT 0,' +
               'state Integer NOT NULL DEFAULT 0,' +
               'content TEXT,' +
+              'ip VARCHAR(255) NOT NULL DEFAULT "",' +
+              'port Integer NOT NULL DEFAULT 80,' +
               'create_time DATETIME,' +
               'update_time DATETIME' +
               ')',

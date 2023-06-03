@@ -1,18 +1,11 @@
 <template>
   <el-aside width="380px">
     <div>
-      <el-input
-        placeholder="请输入内容"
-        v-model="keyword"
-        class="input-with-select"
-      >
+      <el-input placeholder="请输入内容" v-model="keyword" class="input-with-select">
         <template slot="prepend">tcp://</template>
         <el-button slot="append" icon="el-icon-search" @click="getList"></el-button>
       </el-input>
-      <CreateConnection
-        v-model="dialogFormVisible"
-        @afterCreate="afterCreateSession"
-      ></CreateConnection>
+      <Create v-model="dialogFormVisible" @afterCreate="afterCreate"></Create>
     </div>
     <div class="session-create">
       <el-button type="primary" round icon="el-icon-plus" @click="dialogFormVisible = true">{{
@@ -20,43 +13,27 @@
       }}</el-button>
     </div>
     <div class="session-list" v-for="item in list">
-      <div
-        :class="{
-          'session-item hover': value != undefined && value.id == item.id,
-          'session-item': value == undefined || value.id != item.id
-        }"
-        @click="selectSession(item)"
-      >
+      <div :class="{
+        'session-item hover': value != undefined && value.id == item.id,
+        'session-item': value == undefined || value.id != item.id
+      }" @click="selectSession(item)">
         {{ item.ip }}:{{ item.port }}
-        <el-tag
-          v-if="
-            map[item.id] !== undefined && map[item.id].readyState === 'open'
-          "
-          type="success"
-          effect="dark"
-          size="mini"
-          class="session-state"
-          >{{ $t('index.session_state_online') }}</el-tag
-        >
-        <el-tag
-          v-else
-          type="danger"
-          effect="dark"
-          size="mini"
-          class="session-state"
-          >{{ $t('index.session_state_offline') }}</el-tag
-        >
+        <el-tag v-if="map[item.id] !== undefined && map[item.id].listening" type="success" effect="dark" size="mini" class="session-state">{{ $t('index.session_state_online')
+  }}</el-tag>
+        <el-tag v-else type="danger" effect="dark" size="mini" class="session-state">{{ $t('index.session_state_offline')
+        }}</el-tag>
       </div>
     </div>
   </el-aside>
 </template>
 
 <script>
-import CreateConnection from './CreateConnection.vue'
+import Create from './Create.vue'
 import { list } from '../../../server/sqlite3'
+import { SERVER } from '../../const/session'
 export default {
   name: 'Sidebar',
-  components: { CreateConnection },
+  components: { Create },
   props: {
     value: {
       type: Object,
@@ -67,11 +44,11 @@ export default {
     value(newVal) {
       const id = newVal.id
       console.log('id', id)
-      this.map[id] = newVal.client
+      this.map[id] = newVal.server
       console.log('map', this.map)
       const index = this.indexMap[id]
       if (this.list[index] !== undefined) {
-        this.list[index].client = this.map[id]
+        this.list[index].server = this.map[id]
       }
     }
   },
@@ -89,15 +66,15 @@ export default {
   },
   methods: {
     getList() {
-      let where
+      let where = [['type', '=', SERVER]]
       if (this.keyword) {
-        where = [[`(ip || ':' || port)`, 'LIKE', `%${this.keyword}%`]]
+        where.push([`(ip || ':' || port)`, 'LIKE', `%${this.keyword}%`])
       }
       list('session', where, 'update_time DESC').then((list) => {
         this.indexMap = {}
         for (let index in list) {
           let item = list[index]
-          item.client = this.map[item.id]
+          item.server = this.map[item.id]
           this.indexMap[item.id] = Number(index)
         }
         this.list = list
@@ -107,20 +84,20 @@ export default {
         }
       })
     },
-    afterCreateSession(session) {
-      this.$emit('afterCreateSession', session, (client) => {
+    afterCreate(session) {
+      this.$emit('afterCreate', session, (server) => {
         if (this.map[session.id] !== undefined) {
           this.map[session.id].destroy()
           this.map[session.id] = undefined
         }
         this.getList()
-        this.closeCreateConnection()
+        this.closeCreate()
       })
     },
     selectSession(session) {
       this.$emit('input', session)
     },
-    closeCreateConnection() {
+    closeCreate() {
       this.dialogFormVisible = false
     }
   }
@@ -147,6 +124,7 @@ export default {
 .session-list {
   border-top: 1px solid rgba(191, 191, 191, 0.5);
 }
+
 .session-item {
   padding: 20px 20px;
   border-bottom: 1px solid rgba(191, 191, 191, 0.5);
@@ -156,6 +134,7 @@ export default {
 .session-state {
   float: right;
 }
+
 .hover {
   background: rgba(191, 191, 191, 0.5);
 }

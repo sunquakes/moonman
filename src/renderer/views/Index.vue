@@ -3,16 +3,16 @@
     <Menu v-model="menu"></Menu>
     <ClientSidebar
       v-show="menu == CLIENT"
-      v-model="session"
-      @afterCreateSession="afterCreateSession"
+      v-model="client"
+      @afterCreate="afterCreateClient"
     ></ClientSidebar>
-    <ClientSession v-show="menu == CLIENT" ref="Session" v-model="session"></ClientSession>
+    <ClientSession v-show="menu == CLIENT" ref="ClientSession" v-model="client"></ClientSession>
     <ServerSidebar
       v-show="menu == SERVER"
-      v-model="session"
-      @afterCreateSession="afterCreateSession"
+      v-model="server"
+      @afterCreate="afterCreateServer"
     ></ServerSidebar>
-    <ServerSession v-show="menu == SERVER" ref="Session" v-model="session"></ServerSession>
+    <ServerSession v-show="menu == SERVER" ref="ServerSession" v-model="server"></ServerSession>
   </el-container>
 </template>
 
@@ -31,14 +31,20 @@ export default {
       CLIENT,
       SERVER,
       menu: CLIENT,
-      session: undefined
+      client: undefined,
+      server: undefined
     }
   },
   mounted() {},
   methods: {
-    afterCreateSession(session, callback) {
+    afterCreateClient(session, callback) {
       this.$nextTick(() => {
-        this.$refs.Session.connect(session.ip, session.port, callback)
+        this.$refs.ClientSession.connect(session.ip, session.port, callback)
+      })
+    },
+    afterCreateServer(session, callback) {
+      this.$nextTick(() => {
+        this.$refs.ServerSession.listen(session.ip, session.port, callback)
       })
     }
   }
