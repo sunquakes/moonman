@@ -1,31 +1,50 @@
 <template>
   <el-container>
-    <Menu></Menu>
-    <Sidebar
-      v-model="session"
-      @afterCreateSession="afterCreateSession"
-    ></Sidebar>
-    <Session ref="Session" v-model="session"></Session>
+    <Menu v-model="menu"></Menu>
+    <ClientSidebar
+      v-show="menu == CLIENT"
+      v-model="client"
+      @afterCreate="afterCreateClient"
+    ></ClientSidebar>
+    <ClientSession v-show="menu == CLIENT" ref="ClientSession" v-model="client"></ClientSession>
+    <ServerSidebar
+      v-show="menu == SERVER"
+      v-model="server"
+      @afterCreate="afterCreateServer"
+    ></ServerSidebar>
+    <ServerSession v-show="menu == SERVER" ref="ServerSession" v-model="server"></ServerSession>
   </el-container>
 </template>
 
 <script>
-import Sidebar from '../components/index/Sidebar.vue'
-import Session from '../components/index/Session.vue'
+import ClientSidebar from '../components/client/Sidebar.vue'
+import ClientSession from '../components/client/Session.vue'
+import ServerSidebar from '../components/server/Sidebar.vue'
+import ServerSession from '../components/server/Session.vue'
 import Menu from '../components/index/Menu.vue'
+import { CLIENT, SERVER } from '../const/menu'
 export default {
   name: 'Index',
-  components: { Sidebar, Session, Menu },
+  components: { ClientSidebar, ClientSession, ServerSidebar, ServerSession, Menu },
   data() {
     return {
-      session: undefined
+      CLIENT,
+      SERVER,
+      menu: CLIENT,
+      client: undefined,
+      server: undefined
     }
   },
   mounted() {},
   methods: {
-    afterCreateSession(session, callback) {
+    afterCreateClient(session, callback) {
       this.$nextTick(() => {
-        this.$refs.Session.connect(session.ip, session.port, callback)
+        this.$refs.ClientSession.connect(session.ip, session.port, callback)
+      })
+    },
+    afterCreateServer(session, callback) {
+      this.$nextTick(() => {
+        this.$refs.ServerSession.listen(session.ip, session.port, callback)
       })
     }
   }

@@ -1,24 +1,25 @@
 <template>
-  <el-menu default-active="0" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-    :collapse="isCollapse">
-    <el-menu-item index="0">
-      <i class="fa fa-user fa-lg"></i>
+  <el-menu :default-active="value" class="el-menu-vertical-demo" :collapse="isCollapse" @select="handleSelect">
+    <el-menu-item index="client" :title="$t('index.menu_client_name')">
+      <i class="fa fa-desktop fa-lg"></i>
       <span slot="title">{{ $t('index.menu_client_name') }}</span>
     </el-menu-item>
-    <el-menu-item index="1">
-      <i class="fa fa-users fa-lg"></i>
+    <el-menu-item index="server" :title="$t('index.menu_server_name')">
+      <i class="fa fa-sitemap fa-lg"></i>
       <span slot="title">{{ $t('index.menu_server_name') }}</span>
     </el-menu-item>
   </el-menu>
 </template>
 
 <script>
+import { CLIENT } from '../../const/menu'
+
 export default {
   name: 'Menu',
   props: {
     value: {
-      type: Boolean,
-      default: false
+      type: String,
+      default: CLIENT
     }
   },
   data() {
@@ -27,11 +28,8 @@ export default {
     }
   },
   methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath)
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath)
+    handleSelect(key, keyPath) {
+      this.$emit('input', key)
     }
   }
 }
