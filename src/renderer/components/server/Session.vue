@@ -147,17 +147,21 @@ export default {
           const hexString =
             this.form.content +
             JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+          this.form.content = hexString
           msg = Buffer.from(hexString, 'hex')
         } else {
           msg =
             this.form.content +
             JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+          this.form.content = msg
         }
         if (this.map === undefined || this.map[this.value.port] === undefined) {
           return
         }
         this.map[this.value.port].forEach(client => {
           let res = client.write(msg)
+          this.form.ip = client.localAddress
+          this.form.port = client.localPort
           if (res === true) {
             this.saveMessage(this.form)
               .then((data) => {
@@ -214,7 +218,13 @@ export default {
         socket.on('data', (data) => {
           let form = Object.assign({}, FORM)
           form.type = 1
-          form.content = data.toString()
+          if (this.value.message_type === 'hex') {
+            form.content = Buffer.from(data, 'utf8').toString('hex')
+          } else {
+            form.content = data.toString()
+          }
+          form.ip = socket.remoteAddress
+          form.port = socket.remotePort
           this.saveMessage(form)
         })
         socket.on('end', () => { })

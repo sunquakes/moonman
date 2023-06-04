@@ -3,38 +3,21 @@
     <el-header>
       <el-input v-model="address" class="input-with-select" :disabled="true">
         <template slot="prepend">tcp://</template>
-        <el-button
-          v-if="
-            this.value !== undefined &&
-            this.value.client !== undefined &&
-            this.value.client.readyState == 'open'
-          "
-          class="chain-broken"
-          slot="append"
-          @click="close"
-          :disabled="value === undefined ? true : false"
-        >
+        <el-button v-if="this.value !== undefined &&
+          this.value.client !== undefined &&
+          this.value.client.readyState == 'open'
+          " class="chain-broken" slot="append" @click="close" :disabled="value === undefined ? true : false">
           <i class="fa fa-chain-broken fa-lg"></i>
         </el-button>
-        <el-button
-          v-else
-          class="chain"
-          slot="append"
-          @click="reconnect"
-          :disabled="value === undefined ? true : false"
-        >
+        <el-button v-else class="chain" slot="append" @click="reconnect" :disabled="value === undefined ? true : false">
           <i class="fa fa-chain fa-lg"></i>
         </el-button>
       </el-input>
     </el-header>
     <el-main>
       <el-row id="messages">
-        <el-col
-          v-for="item in list"
-          :offset="item.type == 0 ? 6 : 0"
-          :span="18"
-          :class="{ 'remote-col': item.type == 1, 'local-col': item.type == 0 }"
-        >
+        <el-col v-for="item in list" :offset="item.type == 0 ? 6 : 0" :span="18"
+          :class="{ 'remote-col': item.type == 1, 'local-col': item.type == 0 }">
           <div class="msg-time">{{ item.create_time }}</div>
           <div class="msg-content">
             {{ item.content }}
@@ -45,12 +28,7 @@
     <el-footer height="200px">
       <el-row>
         <el-col :span="24">
-          <el-input
-            type="textarea"
-            :rows="4"
-            placeholder="请输入内容"
-            v-model="form.content"
-          >
+          <el-input type="textarea" :rows="4" placeholder="请输入内容" v-model="form.content">
           </el-input>
         </el-col>
       </el-row>
@@ -60,40 +38,23 @@
             <el-row class="session-config">
               <el-col :span="8">
                 <el-form-item :label="$t('index.session_delimiter')">
-                  <el-input
-                    v-model="value.delimiter"
-                    @input="updateSession"
-                  ></el-input>
+                  <el-input v-model="value.delimiter" @input="updateSession"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="16">
                 <el-form-item>
-                  <el-radio
-                    v-model="value.message_type"
-                    label="hex"
-                    border
-                    @input="updateSession"
-                    >{{ $t('index.session_message_type_hex') }}</el-radio
-                  >
-                  <el-radio
-                    v-model="value.message_type"
-                    label="string"
-                    border
-                    @input="updateSession"
-                    >{{ $t('index.session_message_type_string') }}</el-radio
-                  >
+                  <el-radio v-model="value.message_type" label="hex" border @input="updateSession">{{
+                    $t('index.session_message_type_hex') }}</el-radio>
+                  <el-radio v-model="value.message_type" label="string" border @input="updateSession">{{
+                    $t('index.session_message_type_string') }}</el-radio>
                 </el-form-item>
               </el-col>
             </el-row>
           </el-form>
         </el-col>
         <el-col :offset="value === undefined ? 18 : 0" :span="6" class="right">
-          <el-button
-            type="primary"
-            @click="saveLocalMessage"
-            :disabled="value === undefined ? true : false"
-            >{{ $t('index.session_send_message') }}</el-button
-          >
+          <el-button type="primary" @click="saveLocalMessage" :disabled="value === undefined ? true : false">{{
+            $t('index.session_send_message') }}</el-button>
         </el-col>
       </el-row>
     </el-footer>
@@ -184,11 +145,13 @@ export default {
           const hexString =
             this.form.content +
             JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+          this.form.content = hexString
           msg = Buffer.from(hexString, 'hex')
         } else {
           msg =
             this.form.content +
             JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+          this.form.content = msg
         }
         let res = this.value.client.write(msg)
         if (res === true) {
@@ -238,11 +201,15 @@ export default {
     connect(ip, port, callback) {
       let client = new net.Socket()
       client.connect(port, ip, () => {
-        client.on('close', () => {})
+        client.on('close', () => { })
         client.on('data', (data) => {
           let form = Object.assign({}, FORM)
           form.type = 1
-          form.content = data.toString()
+          if (this.value.message_type === 'hex') {
+            form.content = Buffer.from(data, 'utf8').toString('hex')
+          } else {
+            form.content = data.toString()
+          }
           this.saveMessage(form)
         })
         getOne('session', [
@@ -302,7 +269,7 @@ export default {
       updateById('session', this.value.id, {
         delimiter: this.value.delimiter,
         message_type: this.value.message_type
-      }).then((id) => {})
+      }).then((id) => { })
     }
   }
 }
@@ -332,8 +299,10 @@ export default {
   height: 100vh;
   overflow-y: hidden !important;
 }
+
 ::-webkit-scrollbar {
-  display: none !important; /* Chrome Safari 兼容*/
+  display: none !important;
+  /* Chrome Safari 兼容*/
 }
 
 .el-footer {
