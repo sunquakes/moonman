@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="$t('index.create_new_connect')" :show-close="false" :visible="value">
+  <el-dialog :title="$t('index.create_new_server')" :show-close="false" :visible="value">
     <el-form ref="form" :model="form" :rules="rules">
       <el-col :span="16">
         <el-form-item prop="ip">

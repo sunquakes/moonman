@@ -18,7 +18,10 @@
       <el-row id="messages">
         <el-col v-for="item in list" :offset="item.type == 0 ? 6 : 0" :span="18"
           :class="{ 'remote-col': item.type == 1, 'local-col': item.type == 0 }">
-          <div class="msg-time">{{ item.create_time }}</div>
+          <div class="msg-info">
+            <div class="msg-address">{{ item.ip }}:{{ item.port }}</div>
+            <div class="msg-time">{{ item.create_time }}</div>
+          </div>
           <div class="msg-content">
             {{ item.content }}
           </div>
@@ -65,6 +68,7 @@
 import { list, save, updateById, getOne } from '../../../server/sqlite3'
 import moment from 'moment'
 import { SERVER } from '../../const/session'
+import { READY_STATE } from '../../const/socket'
 const net = window.require('net')
 
 const FORM = {
@@ -158,7 +162,14 @@ export default {
         if (this.map === undefined || this.map[this.value.port] === undefined) {
           return
         }
-        this.map[this.value.port].forEach(client => {
+        const map = this.map[this.value.port]
+        Object.keys(map).forEach(key => {
+          const client = map[key]
+          if (client.readyState !== READY_STATE) {
+            client.destroy()
+            delete map[key]
+            return
+          }
           let res = client.write(msg)
           this.form.ip = client.localAddress
           this.form.port = client.localPort
@@ -211,9 +222,15 @@ export default {
       const server = net.createServer((socket) => {
         const port = socket.localPort
         if (this.map[port] === undefined) {
-          this.map[port] = []
+          this.map[port] = {}
         }
-        this.map[port].push(socket)
+        const key = `${socket.remoteAddress}:${socket.remotePort}`
+        // Register client to the map
+        if (this.map[port][key] !== undefined) {
+          this.map[port][key].destroy()
+          this.map[port][key] = undefined
+        }
+        this.map[port][key] = socket
 
         socket.on('data', (data) => {
           let form = Object.assign({}, FORM)
@@ -288,10 +305,12 @@ export default {
       if (this.map === undefined || this.map[port] === undefined) {
         return
       }
-      this.map[port].forEach(client => {
+      const map = this.map[port]
+      Object.keys(map).forEach(key => {
+        const client = map[key]
         client.destroy()
       })
-      this.map[port] = []
+      this.map[port] = {}
       this.value.server.close(() => {
       })
     },
@@ -305,7 +324,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .el-container {
   height: 100vh;
 }
@@ -384,13 +403,26 @@ export default {
   padding: 6px 6px;
   background-color: rgba(191, 191, 191, 0.5);
   border-radius: 10px;
-  display: inline-flex;
+  /* display: inline-flex; */
+}
+
+.msg-info {
+  margin-top: 10px;
+}
+
+.msg-address {
+  color: #bfbfbf;
+  display: inline-block;
+  font-size: 14px;
+  padding: 0px 5px;
+  margin-bottom: 5px;
 }
 
 .msg-time {
+  display: inline-block;
   font-size: 14px;
   color: #bfbfbf;
-  padding: 5px 5px;
+  padding: 0px 5px;
   margin-bottom: 5px;
 }
 

@@ -18,7 +18,10 @@
       <el-row id="messages">
         <el-col v-for="item in list" :offset="item.type == 0 ? 6 : 0" :span="18"
           :class="{ 'remote-col': item.type == 1, 'local-col': item.type == 0 }">
-          <div class="msg-time">{{ item.create_time }}</div>
+          <div class="msg-info">
+            <div class="msg-address">{{ item.ip }}:{{ item.port }}</div>
+            <div class="msg-time">{{ item.create_time }}</div>
+          </div>
           <div class="msg-content">
             {{ item.content }}
           </div>
@@ -153,8 +156,11 @@ export default {
             JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
           this.form.content = msg
         }
-        let res = this.value.client.write(msg)
+        const client = this.value.client
+        let res = client.write(msg)
         if (res === true) {
+          this.form.ip = client.localAddress
+          this.form.port = client.localPort
           this.saveMessage(this.form)
             .then((data) => {
               this.form.content = ''
@@ -210,6 +216,8 @@ export default {
           } else {
             form.content = data.toString()
           }
+          form.ip = client.remoteAddress
+          form.port = client.remotePort
           this.saveMessage(form)
         })
         getOne('session', [
@@ -275,7 +283,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .el-container {
   height: 100vh;
 }
@@ -357,7 +365,20 @@ export default {
   display: inline-flex;
 }
 
+.msg-info {
+  margin-top: 10px;
+}
+
+.msg-address {
+  color: #bfbfbf;
+  display: inline-block;
+  font-size: 14px;
+  padding: 0px 5px;
+  margin-bottom: 5px;
+}
+
 .msg-time {
+  display: inline-block;
   font-size: 14px;
   color: #bfbfbf;
   padding: 5px 5px;

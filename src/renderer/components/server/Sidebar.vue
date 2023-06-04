@@ -1,7 +1,7 @@
 <template>
   <el-aside width="380px">
     <div>
-      <el-input placeholder="请输入内容" v-model="keyword" class="input-with-select">
+      <el-input :placeholder="$t('index.sidebar_keyword_placeholder')" v-model="keyword" class="input-with-select">
         <template slot="prepend">tcp://</template>
         <el-button slot="append" icon="el-icon-search" @click="getList"></el-button>
       </el-input>
@@ -9,7 +9,7 @@
     </div>
     <div class="session-create">
       <el-button type="primary" round icon="el-icon-plus" @click="dialogFormVisible = true">{{
-        $t('index.create_new_connect')
+        $t('index.create_new_server')
       }}</el-button>
     </div>
     <div class="session-list" v-for="item in list">
