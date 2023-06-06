@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('index.create_new_connect')"
+    :title="$t('index.create_new_client')"
     :show-close="false"
     :visible="value"
   >

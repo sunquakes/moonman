@@ -3,6 +3,10 @@
 import { app, BrowserWindow } from 'electron'
 import '../renderer/store'
 
+const Store = require('electron-store')
+const store = new Store()
+const LOCALE_KEY = 'locale'
+
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -58,6 +62,10 @@ app.on('activate', () => {
   }
 })
 
+app.whenReady().then(() => {
+  const systemLanguage = app.getLocale()
+  store.set(LOCALE_KEY, systemLanguage)
+})
 /**
  * Auto Updater
  *

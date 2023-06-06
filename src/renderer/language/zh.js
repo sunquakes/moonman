@@ -4,7 +4,9 @@ module.exports = {
     cancel: '取消'
   },
   index: {
-    create_new_connect: '新建链接',
+    sidebar_keyword_placeholder: '请输入关键词',
+    create_new_server: '新建服务端',
+    create_new_client: '新建客户端',
     session_state_online: '在线',
     session_state_offline: '离线',
     session_send_message_fail: '发送失败',

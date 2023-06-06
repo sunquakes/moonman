@@ -4,7 +4,9 @@ module.exports = {
     cancel: 'cancel'
   },
   index: {
-    create_new_connect: 'Create new connection',
+    sidebar_keyword_placeholder: 'Please input the keyword',
+    create_new_server: 'Create new server',
+    create_new_client: 'Create new client',
     session_state_online: 'online',
     session_state_offline: 'offline',
     session_send_message_fail: 'Send failed.',
