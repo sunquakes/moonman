@@ -27,16 +27,20 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         # cache: 'npm'
+
     - name: Install Yarn
       run: |
         npm install -g yarn
         yarn cache clean --force
+
     - name: Install 
       run: yarn
+
     - name: Build
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: yarn build
+
     - name: Upload file
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v2
@@ -50,6 +54,34 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
+
+    - name: Get Tag Name
+      id: extract_tag
+      run: |
+        echo "tag_name=${GITHUB_REF#refs/tags/}" >> ${GITHUB_OUTPUT}
+
+    - name: Read Changelog 
+      if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
+      id: read_changelog
+      run: |
+        # Set the delimiter
+        delimiter="---"
+
+        # Read the file and extract the first part
+        changelog=""
+        while IFS= read -r line
+        do
+            if [[ "$line" == "$delimiter" ]]
+            then
+                break
+            fi
+
+            changelog+="$line\n"
+        done < "CHANGELOG.md"
+
+        # Display the first part
+        echo "changelog=$changelog" >> ${GITHUB_OUTPUT}
+
     - name: Release
       if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
@@ -60,9 +92,7 @@ jobs:
           build/*.dmg
           build/*.snap
           build/*.blockmap
-        tag_name: v0.0.1
-        release_name: Release 0.0.1
-        body: |
-          ## Feature
-          - Tcp client.
+        tag_name: ${{ steps.extract_tag.outputs.tag_name }}
+        release_name: Release ${{ steps.extract_tag.outputs.tag_name }}
+        body: ${{ steps.read_changelog.outputs.changelog }}
         token: ${{ secrets.GH_TOKEN }}
