@@ -1,8 +1,8 @@
 {
   "name": "Moonman",
   "version": "0.1.0",
-  "author": "Robert <sunquakes@outlook.com>",
-  "description": "A tcp desktop server and client🚀",
+  "author": "Shing Rui <sunquakes@outlook.com>",
+  "description": "A cross-platform tcp desktop software. Create servers and clients.🚀",
   "license": "MIT License",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -25,7 +25,7 @@
   },
   "build": {
     "productName": "Moonman",
-    "appId": "com.sunquakes.moonman",
+    "appId": "io.moonquakes.moonman",
     "asar": true,
     "directories": {
       "output": "build"
