@@ -147,16 +147,13 @@ export default {
         })
       } else {
         let msg
+        const delimiter = JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
         if (this.value.message_type === 'hex') {
-          const hexString =
-            this.form.content +
-            JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+          const hexString = this.form.content + delimiter
           this.form.content = hexString
           msg = Buffer.from(hexString, 'hex')
         } else {
-          msg =
-            this.form.content +
-            JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+          msg = this.form.content + delimiter
           this.form.content = msg
         }
         if (this.map === undefined || this.map[this.value.port] === undefined) {
@@ -204,6 +201,8 @@ export default {
       return new Promise((resolve, reject) => {
         data.create_time = moment().format('YYYY-MM-DD HH:mm:ss')
         data.session_id = this.value.id
+        const delimiter = JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
+        data.content = data.content.substr(0, data.content.length - delimiter.length) + this.value.delimiter
         save('message', data)
           .then((id) => {
             let message = Object.assign({}, data)
