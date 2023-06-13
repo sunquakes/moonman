@@ -302,6 +302,7 @@ export default {
     close() {
       const port = this.value.port
       if (this.map === undefined || this.map[port] === undefined) {
+        this.value.server.close()
         return
       }
       const map = this.map[port]
@@ -310,8 +311,7 @@ export default {
         client.destroy()
       })
       this.map[port] = {}
-      this.value.server.close(() => {
-      })
+      this.value.server.close()
     },
     updateSession() {
       updateById('session', this.value.id, {
