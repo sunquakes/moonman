@@ -59,28 +59,38 @@ jobs:
       id: extract_tag
       run: |
         echo "tag_name=${GITHUB_REF#refs/tags/}" >> ${GITHUB_OUTPUT}
+    
+    - name: Extract Changelog In Windows
+      id: extract_changelog_windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        $delimiter = '---'
+        Get-Content -Path 'CHANGELOG.md' | ForEach-Object {
+          if ($_ -eq $delimiter) {
+            break
+          }
+          $_ | Out-File -Append -FilePath 'release_template.md'
+        }
 
-    - name: Read Changelog 
-      if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
-      id: read_changelog
+    - name: Extract Changelog In Linux & Mac 
+      id: extract_changelog_unix
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: |
         # Set the delimiter
         delimiter="---"
 
         # Read the file and extract the first part
-        changelog=""
         while IFS= read -r line
         do
             if [[ "$line" == "$delimiter" ]]
             then
                 break
             fi
-
-            changelog+="$line\n"
+            echo $line >> release_template.md
         done < "CHANGELOG.md"
-
-        # Display the first part
-        echo "changelog=$changelog" >> ${GITHUB_OUTPUT}
+      
+    - name: Substitute Variables
+      run: envsubst < release_template.md > release_body.md
 
     - name: Release
       if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
@@ -94,5 +104,6 @@ jobs:
           build/*.blockmap
         tag_name: ${{ steps.extract_tag.outputs.tag_name }}
         release_name: Release ${{ steps.extract_tag.outputs.tag_name }}
-        body: ${{ steps.read_changelog.outputs.changelog }}
+        body: |
+          $(cat release_body.md)
         token: ${{ secrets.GH_TOKEN }}
