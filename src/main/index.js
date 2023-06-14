@@ -45,7 +45,7 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-  mainWindow.webContents.openDevTools() // Open dev-tools
+  // mainWindow.webContents.openDevTools() // Open dev-tools
 }
 
 app.on('ready', createWindow)

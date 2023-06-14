@@ -10,7 +10,6 @@ const getDb = () => {
     } else {
       db = new sqlite3.Database(dbFile, (err) => {
         if (err !== null) {
-          console.error(err)
           db = new sqlite3.Database(':memory:')
         }
         createTable()
