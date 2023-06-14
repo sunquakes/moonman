@@ -80,9 +80,9 @@ jobs:
         delimiter="---"
 
         # Read the file and extract the first part
-        while IFS= read -r line
+        while read -r line
         do
-            if [[ "$line" == "$delimiter" ]]
+            if [[ $line == "$delimiter" ]]
             then
                 break
             fi
