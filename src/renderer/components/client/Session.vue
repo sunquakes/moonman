@@ -31,7 +31,7 @@
     <el-footer height="200px">
       <el-row>
         <el-col :span="24">
-          <el-input type="textarea" :rows="4" placeholder="请输入内容" v-model="form.content">
+          <el-input type="textarea" :rows="4" :placeholder="$t('common.content_placeholder')" v-model="form.content">
           </el-input>
         </el-col>
       </el-row>
@@ -56,6 +56,12 @@
           </el-form>
         </el-col>
         <el-col :offset="value === undefined ? 18 : 0" :span="6" class="right">
+          <el-dropdown split-button :disabled="value === undefined ? true : false" @command="handleCommand">
+            <i class="el-icon-setting"></i>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="clear_message">{{ $t('index.session_clear_message') }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
           <el-button type="primary" @click="saveLocalMessage" :disabled="value === undefined ? true : false">{{
             $t('index.session_send_message') }}</el-button>
         </el-col>
@@ -65,7 +71,7 @@
 </template>
 
 <script>
-import { list, save, updateById, getOne } from '../../../server/sqlite3'
+import { list, save, updateById, getOne, remove } from '../../../server/sqlite3'
 import moment from 'moment'
 const net = window.require('net')
 
@@ -277,6 +283,20 @@ export default {
         delimiter: this.value.delimiter,
         message_type: this.value.message_type
       }).then((id) => { })
+    },
+    handleCommand(command) {
+      switch (command) {
+        case 'clear_message':
+          this.$confirm(this.$t('index.session_clear_message_confirm'), this.$t('common.alert'), {
+            confirmButtonText: this.$t('common.yes'),
+            cancelButtonText: this.$t('common.cancel'),
+            type: 'warning'
+          }).then(() => {
+            remove('message', [['session_id', this.value.id]]).then(() => {
+              this.list = []
+            })
+          })
+      }
     }
   }
 }

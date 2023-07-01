@@ -1,7 +1,10 @@
 module.exports = {
   common: {
     submit: '提交',
-    cancel: '取消'
+    cancel: '取消',
+    yes: '确定',
+    alert: '提示',
+    content_placeholder: '请输入内容'
   },
   index: {
     sidebar_keyword_placeholder: '请输入关键词',
@@ -23,6 +26,8 @@ module.exports = {
     session_message_type_hex: '16进制',
     session_message_type_string: '字符串',
     menu_client_name: '客户端',
-    menu_server_name: '服务端'
+    menu_server_name: '服务端',
+    session_clear_message: '清空消息',
+    session_clear_message_confirm: '确定清空消息？'
   }
 }

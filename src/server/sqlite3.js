@@ -186,4 +186,45 @@ export function getOne(tableName, where) {
   })
 }
 
+export function remove(tableName, where) {
+  let sql = `DELETE FROM ${tableName}`
+  if (where) {
+    let whereArray = []
+    for (let item of where) {
+      if (!(item instanceof Array)) continue
+      if (item.length === 2) {
+        let field = item[0]
+        let value = item[1]
+        if (typeof value === 'string') {
+          value = `'${value}'`
+        }
+        whereArray.push(`${field} = ${value}`)
+      } else if (item.length === 3) {
+        let field = item[0]
+        let symbol = item[1]
+        let value = item[2]
+        if (typeof value === 'string') {
+          value = `'${value}'`
+        }
+        whereArray.push(`${field} ${symbol} ${value}`)
+      }
+    }
+    if (whereArray.length > 0) {
+      let where = whereArray.join(' AND ')
+      sql = `${sql} WHERE ${where}`
+    }
+  }
+  return getDb().then((db) => {
+    return new Promise((resolve, reject) => {
+      db.get(sql, (err, row) => {
+        if (err != null) {
+          reject(err)
+        } else {
+          resolve(row)
+        }
+      })
+    })
+  })
+}
+
 export default getDb

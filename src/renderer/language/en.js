@@ -1,7 +1,10 @@
 module.exports = {
   common: {
-    submit: 'submit',
-    cancel: 'cancel'
+    submit: 'Submit',
+    cancel: 'Cancel',
+    yes: 'Yes',
+    alert: 'Alert',
+    content_placeholder: 'Please input the content'
   },
   index: {
     sidebar_keyword_placeholder: 'Please input the keyword',
@@ -23,6 +26,8 @@ module.exports = {
     session_message_type_hex: 'Hex',
     session_message_type_string: 'String',
     menu_client_name: 'Client',
-    menu_server_name: 'Server'
+    menu_server_name: 'Server',
+    session_clear_message: 'Clear Message',
+    session_clear_message_confirm: 'Are you sure to clear the messages?'
   }
 }
