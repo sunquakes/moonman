@@ -28,6 +28,7 @@ module.exports = {
     menu_client_name: 'Client',
     menu_server_name: 'Server',
     session_clear_message: 'Clear Message',
-    session_clear_message_confirm: 'Are you sure to clear the messages?'
+    session_clear_message_confirm: 'Are you sure to clear the messages?',
+    session_no_more_message: 'There is no more messages.'
   }
 }

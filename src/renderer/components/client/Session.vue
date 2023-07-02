@@ -15,7 +15,10 @@
       </el-input>
     </el-header>
     <el-main>
-      <el-row id="messages">
+      <el-row ref="messages" id="messages">
+        <el-col v-show="loading" :span="24" class="loading">
+          <i class="fa el-icon-loading fa-lg"></i>
+        </el-col>
         <el-col v-for="item in list" :offset="item.type == 0 ? 6 : 0" :span="18"
           :class="{ 'remote-col': item.type == 1, 'local-col': item.type == 0 }">
           <div class="msg-info">
@@ -103,24 +106,76 @@ export default {
     return {
       form: Object.assign({}, FORM),
       list: [],
-      address: undefined
+      address: undefined,
+      loading: false,
+      minId: undefined,
+      messageContainer: undefined,
+      eventListener: undefined
     }
   },
   mounted() {
     this.getList()
+    this.$nextTick(() => {
+      this.messageContainer = this.$refs.messages.$el
+      this.messageContainer.addEventListener('scroll', this.scrollTop)
+    })
   },
   methods: {
+    scrollTop(event) {
+      let position = this.messageContainer.scrollTop
+      if (position === 0) {
+        this.getPreviousList()
+      }
+    },
     getList() {
+      this.minId = undefined
       if (this.value !== undefined) {
-        list('message', [
+        let where = [
           ['state', 1],
           ['session_id', this.value.id]
-        ]).then((list) => {
+        ]
+        list('message', where, 'id DESC', 0, 10).then((list) => {
           this.list = list
+          list.sort((a, b) => {
+            return a.id - b.id
+          })
+          if (list.length > 0) {
+            this.minId = list[0].id
+          }
           this.$nextTick(() => {
             let messages = this.$el.querySelector('#messages')
             messages.scrollTop = messages.scrollHeight
           })
+        })
+      }
+    },
+    getPreviousList() {
+      if (this.loading) {
+        return
+      }
+      this.loading = true
+      if (this.value !== undefined) {
+        let where = [
+          ['state', 1],
+          ['session_id', this.value.id]
+        ]
+        if (this.minId !== undefined) {
+          where.push(['id', '<', this.minId])
+        }
+        list('message', where, 'id DESC', 0, 10).then((list) => {
+          this.loading = false
+          if (list.length === 0) {
+            this.$message({
+              type: 'warning',
+              message: this.$t('index.session_no_more_message')
+            })
+            return
+          }
+          list.sort((a, b) => {
+            return a.id - b.id
+          })
+          this.minId = list[0].id
+          this.list.unshift(...list)
         })
       }
     },
@@ -199,6 +254,9 @@ export default {
           .then((id) => {
             let message = Object.assign({}, data)
             message.id = id
+            if (this.minId === undefined) {
+              this.minId = id
+            }
             this.list.push(message)
             this.$nextTick(() => {
               let messages = this.$el.querySelector('#messages')
@@ -298,6 +356,9 @@ export default {
           })
       }
     }
+  },
+  destroyed() {
+    this.messageContainer.removeEventListener('scroll', this.scrollTop)
   }
 }
 </script>
@@ -407,6 +468,15 @@ export default {
 #messages {
   overflow-y: scroll;
   height: 100%;
+}
+
+.el-main {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+.loading {
+  text-align: center;
 }
 
 .session-config {
