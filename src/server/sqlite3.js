@@ -100,7 +100,7 @@ export function updateById(tableName, id, data) {
   })
 }
 
-export function list(tableName, where, orderBy) {
+export function list(tableName, where, orderBy, offset, limit) {
   let sql = `SELECT * FROM ${tableName}`
   if (where) {
     let whereArray = []
@@ -130,6 +130,9 @@ export function list(tableName, where, orderBy) {
   }
   if (orderBy) {
     sql = `${sql} ORDER BY ${orderBy}`
+  }
+  if (offset !== undefined && limit !== undefined) {
+    sql = `${sql} LIMIT ${offset}, ${limit}`
   }
   return getDb().then((db) => {
     return new Promise((resolve, reject) => {
