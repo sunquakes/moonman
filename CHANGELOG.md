@@ -1,3 +1,10 @@
+## [v0.2.0] - 2023-07-04
+
+### Added
+- Add clear messages.
+- Add scroll top to load previous messages.
+---
+
 ## [v0.1.0] - 2023-06-05
 
 ### Added

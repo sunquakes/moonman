@@ -6,13 +6,13 @@
       v-model="client"
       @afterCreate="afterCreateClient"
     ></ClientSidebar>
-    <ClientSession v-show="menu == CLIENT" ref="ClientSession" v-model="client"></ClientSession>
+    <ClientSession v-if="menu == CLIENT" ref="ClientSession" v-model="client"></ClientSession>
     <ServerSidebar
       v-show="menu == SERVER"
       v-model="server"
       @afterCreate="afterCreateServer"
     ></ServerSidebar>
-    <ServerSession v-show="menu == SERVER" ref="ServerSession" v-model="server"></ServerSession>
+    <ServerSession v-if="menu == SERVER" ref="ServerSession" v-model="server"></ServerSession>
   </el-container>
 </template>
 
