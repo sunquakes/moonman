@@ -44,9 +44,7 @@ export default {
   watch: {
     value(newVal) {
       const id = newVal.id
-      console.log('id', id)
       this.map[id] = newVal.client
-      console.log('map', this.map)
       const index = this.indexMap[id]
       if (this.list[index] !== undefined) {
         this.list[index].client = this.map[id]

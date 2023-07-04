@@ -145,8 +145,7 @@ export default {
             this.minId = list[0].id
           }
           this.$nextTick(() => {
-            let messages = this.$el.querySelector('#messages')
-            messages.scrollTop = messages.scrollHeight
+            this.messageContainer.scrollTop = this.messageContainer.scrollHeight
           })
         })
       }
@@ -178,6 +177,10 @@ export default {
           })
           this.minId = list[0].id
           this.list.unshift(...list)
+        }).then(() => {
+          this.$nextTick(() => {
+            this.messageContainer.scrollTop = 5
+          })
         })
       }
     },
