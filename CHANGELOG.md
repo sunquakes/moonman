@@ -1,3 +1,12 @@
+## [v0.2.1] - 2023-07-10
+
+### Fixed
+- Fixed bug that the server can not send message to the client after change tab.
+
+### Changed
+- Warning message when sending message while without client connected to the server.
+---
+
 ## [v0.2.0] - 2023-07-04
 
 ### Added

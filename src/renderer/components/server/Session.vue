@@ -209,6 +209,22 @@ export default {
           message: this.$t('index.session_unconnected')
         })
       } else {
+        const map = this.map[this.value.port]
+        if (this.map === undefined || this.map[this.value.port] === undefined) {
+          this.$message({
+            type: 'warning',
+            message: this.$t('index.session_without_client')
+          })
+          return
+        }
+        const keys = Object.keys(map)
+        if (keys.length === 0) {
+          this.$message({
+            type: 'warning',
+            message: this.$t('index.session_without_client')
+          })
+          return
+        }
         let msg
         const delimiter = JSON.parse('"' + this.value.delimiter.replace(/\\/g, '\\') + '"')
         if (this.value.message_type === 'hex') {
@@ -219,11 +235,7 @@ export default {
           msg = this.form.content + delimiter
           this.form.content = msg
         }
-        if (this.map === undefined || this.map[this.value.port] === undefined) {
-          return
-        }
-        const map = this.map[this.value.port]
-        Object.keys(map).forEach(key => {
+        keys.forEach(key => {
           const client = map[key]
           if (client.readyState !== READY_STATE) {
             client.destroy()
@@ -296,6 +308,9 @@ export default {
           this.map[port][key] = undefined
         }
         this.map[port][key] = socket
+        socket.on('close', () => {
+          delete this.map[port][key]
+        })
 
         socket.on('data', (data) => {
           let form = Object.assign({}, FORM)
@@ -398,6 +413,11 @@ export default {
             })
           })
       }
+    },
+    scrollBottom() {
+      this.$nextTick(() => {
+        this.messageContainer.scrollTop = this.messageContainer.scrollHeight
+      })
     }
   },
   destroyed() {
