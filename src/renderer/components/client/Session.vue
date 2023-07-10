@@ -358,6 +358,11 @@ export default {
             })
           })
       }
+    },
+    scrollBottom() {
+      this.$nextTick(() => {
+        this.messageContainer.scrollTop = this.messageContainer.scrollHeight
+      })
     }
   },
   destroyed() {

@@ -29,6 +29,7 @@ module.exports = {
     menu_server_name: '服务端',
     session_clear_message: '清空消息',
     session_clear_message_confirm: '确定清空消息？',
-    session_no_more_message: '没有更多的消息了。'
+    session_no_more_message: '没有更多的消息了。',
+    session_without_client: '没有客户端连接。'
   }
 }
