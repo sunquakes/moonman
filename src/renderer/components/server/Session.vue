@@ -97,10 +97,12 @@ export default {
     }
   },
   watch: {
-    value(newVal) {
+    value(newVal, oldVal) {
       if (newVal !== undefined) {
         this.address = newVal.ip + ':' + newVal.port
         this.getList()
+      } else {
+        this.init(oldVal)
       }
     }
   },
@@ -124,6 +126,13 @@ export default {
     })
   },
   methods: {
+    init(session) {
+      if (session !== undefined) {
+        this.closeSession(session)
+      }
+      this.address = undefined
+      this.list = []
+    },
     scrollTop(event) {
       let position = this.messageContainer.scrollTop
       if (position === 0) {
@@ -381,9 +390,12 @@ export default {
       this.listen(ip, port)
     },
     close() {
-      const port = this.value.port
+      this.closeSession(this.value)
+    },
+    closeSession(session) {
+      const port = session.port
       if (this.map === undefined || this.map[port] === undefined) {
-        this.value.server.close()
+        session.server.close()
         return
       }
       const map = this.map[port]
@@ -392,7 +404,7 @@ export default {
         client.destroy()
       })
       this.map[port] = {}
-      this.value.server.close()
+      session.server.close()
     },
     updateSession() {
       updateById('session', this.value.id, {

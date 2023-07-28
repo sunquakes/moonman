@@ -30,6 +30,8 @@ module.exports = {
     session_clear_message: 'Clear Message',
     session_clear_message_confirm: 'Are you sure to clear the messages?',
     session_no_more_message: 'There is no more messages.',
-    session_without_client: 'No client connection.'
+    session_without_client: 'No client connection.',
+    session_delete: 'Delete',
+    session_delete_confirm: 'Are you sure to delete the session?'
   }
 }

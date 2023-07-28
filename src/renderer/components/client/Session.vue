@@ -99,6 +99,8 @@ export default {
       if (newVal !== undefined) {
         this.address = newVal.ip + ':' + newVal.port
         this.getList()
+      } else {
+        this.init()
       }
     }
   },
@@ -121,6 +123,10 @@ export default {
     })
   },
   methods: {
+    init() {
+      this.address = undefined
+      this.list = []
+    },
     scrollTop(event) {
       let position = this.messageContainer.scrollTop
       if (position === 0) {

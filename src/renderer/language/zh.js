@@ -30,6 +30,8 @@ module.exports = {
     session_clear_message: '清空消息',
     session_clear_message_confirm: '确定清空消息？',
     session_no_more_message: '没有更多的消息了。',
-    session_without_client: '没有客户端连接。'
+    session_without_client: '没有客户端连接。',
+    session_delete: '删除',
+    session_delete_confirm: '确定删除对话？'
   }
 }

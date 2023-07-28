@@ -18,10 +18,23 @@
         'session-item': value == undefined || value.id != item.id
       }" @click="selectSession(item)">
         {{ item.ip }}:{{ item.port }}
+        <el-dropdown trigger="click" class="session-right" @command="handleCommand">
+          <span class="el-dropdown-link">
+            <i class="el-icon-more el-icon--right"></i>
+            <i class="el-icon-caret-bottom"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item class="clearfix" :command="{ function: 'deleteSession', id: item.id }">
+              <font color="red">{{ $t('index.session_delete') }}</font>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
         <el-tag v-if="map[item.id] !== undefined && map[item.id].readyState === 'open'
-          " type="success" effect="dark" size="mini" class="session-state">{{ $t('index.session_state_online')
+          " type="success" effect="dark" size="mini" class="session-state session-right">{{
+    $t('index.session_state_online')
   }}</el-tag>
-        <el-tag v-else type="danger" effect="dark" size="mini" class="session-state">{{ $t('index.session_state_offline')
+        <el-tag v-else type="danger" effect="dark" size="mini" class="session-state session-right">{{
+          $t('index.session_state_offline')
         }}</el-tag>
       </div>
     </div>
@@ -30,7 +43,7 @@
 
 <script>
 import CreateConnection from './CreateConnection.vue'
-import { list } from '../../../server/sqlite3'
+import { list, remove } from '../../../server/sqlite3'
 import { CLIENT } from '../../const/session'
 export default {
   name: 'Sidebar',
@@ -43,11 +56,13 @@ export default {
   },
   watch: {
     value(newVal) {
-      const id = newVal.id
-      this.map[id] = newVal.client
-      const index = this.indexMap[id]
-      if (this.list[index] !== undefined) {
-        this.list[index].client = this.map[id]
+      if (newVal !== undefined) {
+        const id = newVal.id
+        this.map[id] = newVal.client
+        const index = this.indexMap[id]
+        if (this.list[index] !== undefined) {
+          this.list[index].client = this.map[id]
+        }
       }
     }
   },
@@ -80,6 +95,8 @@ export default {
         if (this.value === undefined && this.list.length > 0) {
           let session = this.list[0]
           this.$emit('input', session)
+        } else if (this.list.length === 0) {
+          this.$emit('input', undefined)
         }
       })
     },
@@ -98,6 +115,25 @@ export default {
     },
     closeCreateConnection() {
       this.dialogFormVisible = false
+    },
+    deleteSession(obj, id) {
+      obj.$confirm(obj.$t('index.session_delete_confirm'), obj.$t('common.alert'), {
+        confirmButtonText: obj.$t('common.yes'),
+        cancelButtonText: obj.$t('common.cancel'),
+        type: 'warning'
+      }).then(() => {
+        remove('session', [['id', id]]).then(() => {
+          return remove('message', [['session_id', id]])
+        })
+      }).then(() => {
+        obj.$emit('input', undefined)
+        obj.$nextTick(() => {
+          obj.getList()
+        })
+      })
+    },
+    handleCommand(command) {
+      this.$options.methods[command.function](this, command.id)
     }
   }
 }
@@ -131,6 +167,10 @@ export default {
 }
 
 .session-state {
+  margin-right: 10px;
+}
+
+.session-right {
   float: right;
 }
 
