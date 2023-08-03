@@ -33,5 +33,12 @@ module.exports = {
     session_without_client: 'No client connection.',
     session_delete: 'Delete',
     session_delete_confirm: 'Are you sure to delete the session?'
+  },
+  info: {
+    version: 'Version',
+    author: 'Author',
+    website: 'Website',
+    update: 'Update',
+    check_update: 'check update'
   }
 }

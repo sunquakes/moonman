@@ -156,13 +156,8 @@ export default {
   width: 80%;
 }
 
-.session-list {
-  border-top: 1px solid rgba(191, 191, 191, 0.5);
-}
-
 .session-item {
   padding: 20px 20px;
-  border-bottom: 1px solid rgba(191, 191, 191, 0.5);
   cursor: pointer;
 }
 
@@ -175,6 +170,6 @@ export default {
 }
 
 .hover {
-  background: rgba(191, 191, 191, 0.5);
+  background: rgba(64, 158, 255, 0.2);
 }
 </style>

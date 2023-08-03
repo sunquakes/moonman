@@ -5,6 +5,7 @@
     <ClientSession v-show="menu == CLIENT" ref="ClientSession" v-model="client"></ClientSession>
     <ServerSidebar v-show="menu == SERVER" v-model="server" @afterCreate="afterCreateServer"></ServerSidebar>
     <ServerSession v-show="menu == SERVER" ref="ServerSession" v-model="server"></ServerSession>
+    <InfoIndex v-if="menu == INFO"></InfoIndex>
   </el-container>
 </template>
 
@@ -14,14 +15,16 @@ import ClientSession from '../components/client/Session.vue'
 import ServerSidebar from '../components/server/Sidebar.vue'
 import ServerSession from '../components/server/Session.vue'
 import Menu from '../components/index/Menu.vue'
-import { CLIENT, SERVER } from '../const/menu'
+import InfoIndex from '../components/info/Index.vue'
+import { CLIENT, SERVER, INFO } from '../const/menu'
 export default {
   name: 'Index',
-  components: { ClientSidebar, ClientSession, ServerSidebar, ServerSession, Menu },
+  components: { ClientSidebar, ClientSession, ServerSidebar, ServerSession, Menu, InfoIndex },
   data() {
     return {
       CLIENT,
       SERVER,
+      INFO,
       menu: CLIENT,
       client: undefined,
       server: undefined

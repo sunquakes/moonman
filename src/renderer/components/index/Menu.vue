@@ -5,8 +5,12 @@
       <span slot="title">{{ $t('index.menu_client_name') }}</span>
     </el-menu-item>
     <el-menu-item index="server" :title="$t('index.menu_server_name')">
-      <i class="fa fa-sitemap fa-lg"></i>
+      <i class="fa fa-server fa-lg"></i>
       <span slot="title">{{ $t('index.menu_server_name') }}</span>
+    </el-menu-item>
+    <el-menu-item index="info" :title="$t('index.menu_info')">
+      <i class="fa fa-info fa-lg"></i>
+      <span slot="title">{{ $t('index.menu_info') }}</span>
     </el-menu-item>
   </el-menu>
 </template>

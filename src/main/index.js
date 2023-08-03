@@ -2,6 +2,7 @@
 
 import { app, BrowserWindow } from 'electron'
 import '../renderer/store'
+import './menu'
 
 const Store = require('electron-store')
 const store = new Store()

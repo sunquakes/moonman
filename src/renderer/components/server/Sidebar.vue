@@ -93,7 +93,6 @@ export default {
         this.list = list
         if (this.value === undefined && this.list.length > 0) {
           let session = this.list[0]
-          console.log('input', session)
           this.$emit('input', session)
         } else if (this.list.length === 0) {
           this.$emit('input', undefined)
@@ -156,13 +155,8 @@ export default {
   width: 80%;
 }
 
-.session-list {
-  border-top: 1px solid rgba(191, 191, 191, 0.5);
-}
-
 .session-item {
   padding: 20px 20px;
-  border-bottom: 1px solid rgba(191, 191, 191, 0.5);
   cursor: pointer;
 }
 
@@ -175,6 +169,6 @@ export default {
 }
 
 .hover {
-  background: rgba(191, 191, 191, 0.5);
+  background: rgba(64, 158, 255, 0.2);
 }
 </style>

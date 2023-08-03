@@ -2,6 +2,7 @@
   "name": "Moonman",
   "version": "v0.3.0",
   "author": "Shing Rui <sunquakes@outlook.com>",
+  "website": "https://moonman.moonquakes.io",
   "description": "A cross-platform tcp desktop software. Create servers and clients.🚀",
   "license": "MIT License",
   "main": "./dist/electron/main.js",

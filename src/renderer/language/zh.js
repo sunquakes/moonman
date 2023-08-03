@@ -33,5 +33,12 @@ module.exports = {
     session_without_client: '没有客户端连接。',
     session_delete: '删除',
     session_delete_confirm: '确定删除对话？'
+  },
+  info: {
+    version: '版本',
+    author: '作者',
+    website: '网站',
+    update: '更新',
+    check_update: '检查更新'
   }
 }
