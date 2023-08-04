@@ -6,6 +6,9 @@
   "description": "A cross-platform tcp desktop software. Create servers and clients.🚀",
   "license": "MIT License",
   "main": "./dist/electron/main.js",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "electron:build": "vue-cli-service electron:build",
     "build": "node .electron-vue/build.js && electron-builder",
