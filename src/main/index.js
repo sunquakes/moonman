@@ -3,6 +3,7 @@
 import { app, BrowserWindow } from 'electron'
 import '../renderer/store'
 import './menu'
+require('update-electron-app')({repo: 'sunquakes/moonman'})
 
 const Store = require('electron-store')
 const store = new Store()
@@ -25,6 +26,8 @@ const winURL =
     : `file://${__dirname}/index.html`
 
 function createWindow() {
+  const appPath = app.getAppPath()
+  console.log('Application path:', appPath)
   /**
    * Initial window options
    */
