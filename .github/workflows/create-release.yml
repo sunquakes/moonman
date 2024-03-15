@@ -2,104 +2,67 @@ name: Create Release
 
 on:
   push:
-    tags: 
-      - 'v*.*.*'
+    tags:
+      - '*.*.*'
 
 jobs:
   build:
-
-    runs-on: ${{matrix.os}}
-
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest] 
-        node-version: [16.x]
-    
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        # cache: 'npm'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Install Yarn
-      run: |
-        npm install -g yarn
-        yarn cache clean --force
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          always-auth: true
 
-    - name: Install 
-      run: yarn
+      - name: Extract Changelog
+        id: extract_changelog
+        run: |
+          # Set the delimiter
+          delimiter="---"
 
-    - name: Build
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: yarn build
+          # Read the file and extract the first part
+          while read -r line
+          do
+              if [[ $line == "$delimiter" ]]
+              then
+                  break
+              fi
+              echo $line >> release_body.md
+          done < "CHANGELOG.md"
 
-    - name: Upload file
-      if: ${{ !env.ACT }}
-      uses: actions/upload-artifact@v2
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      with:
-        name: ${{ matrix.os }}
-        path: |
-          build/*latest*.yml
-          build/*.exe
-          build/*.dmg
-          build/*.snap
-          build/*.blockmap
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: release_body.md
+          draft: false
+          prerelease: false
 
-    - name: Get Tag Name
-      id: extract_tag
-      run: |
-        echo "tag_name=${GITHUB_REF#refs/tags/}" >> ${GITHUB_OUTPUT}
-    
-    - name: Extract Changelog In Windows
-      id: extract_changelog_windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        $delimiter = '---'
-        Get-Content -Path 'CHANGELOG.md' | ForEach-Object {
-          if ($_ -eq $delimiter) {
-            break
-          }
-          $_ | Out-File -Append -FilePath 'release_body.md'
-        }
+      - name: Publish to NPM
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" > ~/.npmrc
+          yarn publish
 
-    - name: Extract Changelog In Linux & Mac 
-      id: extract_changelog_unix
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-      run: |
-        # Set the delimiter
-        delimiter="---"
+      - name: Install Vuepress and Build Docs
+        run: |
+          cd docs
+          yarn install
+          yarn docs:build
 
-        # Read the file and extract the first part
-        while read -r line
-        do
-            if [[ $line == "$delimiter" ]]
-            then
-                break
-            fi
-            echo $line >> release_body.md
-        done < "CHANGELOG.md"
-
-    - name: Release
-      if: ${{ !env.ACT }} && startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          build/*latest*.yml
-          build/*.exe
-          build/*.dmg
-          build/*.snap
-          build/*.blockmap
-        tag_name: ${{ steps.extract_tag.outputs.tag_name }}
-        name: Release ${{ steps.extract_tag.outputs.tag_name }}
-        body_path: release_body.md
-        token: ${{ secrets.GH_TOKEN }}
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: docs/docs/.vuepress/dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
