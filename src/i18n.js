@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
-const Store = require('electron-store')
-const store = new Store()
+import zh from './language/zh.js'
+import en from './language/en.js'
 Vue.use(VueI18n)
 
 const DEFAULT_LANG = 'en'
@@ -9,8 +9,8 @@ const LOCALE_KEY = 'locale'
 
 const getLocale = () => {
   let lang
-  const locale = store.get(LOCALE_KEY)
-  if (locale.startsWith('zh')) {
+  const locale = undefined
+  if (locale != undefined && locale.startsWith('zh')) {
     lang = 'zh'
   }
   if (locales[lang] === undefined) {
@@ -20,8 +20,8 @@ const getLocale = () => {
 }
 
 const locales = {
-  zh: require('./language/zh.js'),
-  en: require('./language/en.js')
+  zh,
+  en
 }
 
 const i18n = new VueI18n({

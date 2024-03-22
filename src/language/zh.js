@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   common: {
     submit: '提交',
     cancel: '取消',
@@ -27,6 +27,7 @@ module.exports = {
     session_message_type_string: '字符串',
     menu_client_name: '客户端',
     menu_server_name: '服务端',
+    menu_info: '软件信息',
     session_clear_message: '清空消息',
     session_clear_message_confirm: '确定清空消息？',
     session_no_more_message: '没有更多的消息了。',
