@@ -1,23 +1,47 @@
 {
-  "name": "electron-kits",
-  "version": "0.0.2",
+  "name": "Moonman",
+  "version": "0.3.0",
   "author": "Shing Rui <sunquakes@outlook.com>",
-  "description": "A electron kits, combined with Electron/Vue3/AntiDesign/SQLite3.",
+  "description": "A cross-platform tcp desktop software. Create servers and clients.🚀",
   "keywords": [
     "electron",
     "vue",
-    "anti-design-vue",
-    "sqlite3"
+    "sqlite3",
+    "tcp client",
+    "tcp server"
   ],
-  "license": "Apache-2.0",
+  "license": "MIT License",
   "main": "main.js",
-  "bin": {
-    "ekits": "bin/ekits.js"
-  },
   "build": {
-    "appId": "com.sunquakes.ekits",
+    "productName": "Moonman",
+    "appId": "io.moonquakes.moonman",
+    "asar": true,
     "directories": {
       "output": "build"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "mac": {
+      "icon": "build/icons/icon.icns"
+    },
+    "win": {
+      "icon": "build/icons/icon.ico"
+    },
+    "linux": {
+      "icon": "build/icons"
     }
   },
   "scripts": {
