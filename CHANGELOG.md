@@ -1,3 +1,10 @@
+## [v0.4.0] - 2024-03-26
+
+### Changed
+- Use electron-kits to refactor project.
+- Change node version >= 20.
+---
+
 ## [v0.3.0] - 2023-07-27
 
 ### Added
