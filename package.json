@@ -11,6 +11,7 @@
     "tcp server"
   ],
   "license": "MIT License",
+  "website": "https://moonman.moonquakes.io",
   "main": "main.js",
   "build": {
     "productName": "Moonman",
