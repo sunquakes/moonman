@@ -28,7 +28,9 @@ twitter_username: sunquakesio
 github_username: sunquakes 
 
 # Build settings
-theme: just-the-docs
+# remote_theme: just-the-docs/just-the-docs
+remote_theme: pmarsceill/just-the-docs
+# theme: just-the-docs
 plugins:
   - jekyll-feed
 
