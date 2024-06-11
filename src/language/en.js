@@ -25,6 +25,7 @@ export default {
     session_message_type: 'Message Format',
     session_message_type_hex: 'Hex',
     session_message_type_string: 'String',
+    session_config: 'Config',
     menu_client_name: 'Client',
     menu_server_name: 'Server',
     menu_info: 'Software Infomation',

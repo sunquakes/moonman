@@ -6,8 +6,9 @@ console.log('NODE_ENV', NODE_ENV)
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    autoHideMenuBar: true,
+    minWidth: 1280,
+    minHeight: 720,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
