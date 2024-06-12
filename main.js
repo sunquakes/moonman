@@ -4,8 +4,10 @@ const path = require('path')
 const NODE_ENV = process.env.NODE_ENV
 console.log('NODE_ENV', NODE_ENV)
 
+let win
+
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     autoHideMenuBar: true,
     minWidth: 1280,
     minHeight: 720,
@@ -31,6 +33,9 @@ function createWindow() {
     globalShortcut.register('F12', toggleDevTools)
     toggleDevTools()
   }
+  win.on('closed', function () {
+    win = null
+  })
 }
 
 app.whenReady().then(() => {
@@ -44,6 +49,7 @@ app.whenReady().then(() => {
   app.on('before-quit', () => {
     if (NODE_ENV === 'development') {
       globalShortcut.unregister('F12')
+      console.log(666)
     }
   })
 })
@@ -52,4 +58,30 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+const handleTerminationSignals = () => {
+  if (win) {
+    win.close()
+  }
+  app.quit()
+}
+
+if (process.platform === 'win32') {
+  require('readline')
+    .createInterface({
+      input: process.stdin,
+      output: process.stdout
+    })
+    .on('SIGINT', () => {
+      handleTerminationSignals()
+    })
+}
+
+process.on('SIGINT', () => {
+  handleTerminationSignals()
+})
+
+process.on('SIGTERM', () => {
+  handleTerminationSignals()
 })
