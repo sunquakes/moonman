@@ -75,6 +75,7 @@
               }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
+          <el-divider direction="vertical"></el-divider>
           <el-button
             type="primary"
             @click="saveLocalMessage"
@@ -83,7 +84,9 @@
           >
         </el-col>
       </el-row>
-      <Config v-model="value" :visible.sync="configVisible"></Config>
+      <el-dialog :title="$t('index.session_config')" :visible.sync="configVisible" width="400px">
+        <Config v-model="value" :visible.sync="configVisible"></Config>
+      </el-dialog>
     </el-footer>
   </el-container>
 </template>
@@ -123,7 +126,7 @@ export default {
   },
   data() {
     return {
-      form: Object.assign({}, FORM),
+      form: { ...FORM },
       list: [],
       address: undefined,
       loading: false,
@@ -282,7 +285,7 @@ export default {
           data.content.substr(0, data.content.length - delimiter.length) + this.value.delimiter
         save('message', data)
           .then((id) => {
-            let message = Object.assign({}, data)
+            let message = { ...data }
             message.id = id
             if (this.minId === undefined) {
               this.minId = id
@@ -302,7 +305,7 @@ export default {
       client.connect(port, ip, () => {
         client.on('close', () => {})
         client.on('data', (data) => {
-          let form = Object.assign({}, FORM)
+          let form = { ...FORM }
           form.type = 1
           if (this.value.message_type === 'hex') {
             form.content = Buffer.from(data, 'utf8').toString('hex')
@@ -336,7 +339,7 @@ export default {
               })
             })
           } else {
-            let session = Object.assign({}, row)
+            let session = { ...row }
             session.update_time = moment().format('YYYY-MM-DD HH:mm:ss')
             updateById('session', row.id, session).then((id) => {
               session.client = client
@@ -384,8 +387,10 @@ export default {
               this.list = []
             })
           })
+          break
         case 'config':
           this.configVisible = true
+          break
       }
     },
     scrollBottom() {
