@@ -2,7 +2,7 @@
   <div class="info-container">
     <div class="info-item">
       <el-image class="logo" :src="logo" fit="fill"></el-image>
-      <el-descriptions class="info" :column="1" :size="size" border>
+      <el-descriptions class="info" :column="1" border>
         <el-descriptions-item>
           <template slot="label">
             <div class="info-label">
