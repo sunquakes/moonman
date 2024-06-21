@@ -59,6 +59,7 @@
     "font-awesome": "^4.7.0",
     "moment": "^2.29.4",
     "sqlite3": "^5.1.6",
+    "update-electron-app": "^3.0.0",
     "vue": "^2",
     "vue-i18n": "^8.27.2",
     "vue-router": "^3.0.1",

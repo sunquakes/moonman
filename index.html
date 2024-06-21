@@ -9,5 +9,21 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+      const { shell } = require('electron')
+
+      document.addEventListener('click', function (event) {
+        const target = event.target
+
+        // Check if the clicked element is an anchor (<a>) tag with an href attribute
+        if (target.tagName === 'a' && target.href) {
+          // Only prevent default and open external links
+          if (target.href.startsWith('http')) {
+            event.preventDefault() // Prevent the default link behavior
+            shell.openExternal(target.href) // Open the URL in the default browser
+          }
+        }
+      })
+    </script>
   </body>
 </html>

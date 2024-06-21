@@ -1,5 +1,6 @@
-const { app, BrowserWindow, globalShortcut } = require('electron')
+const { app, autoUpdater, BrowserWindow, globalShortcut } = require('electron')
 const path = require('path')
+const { version } = require('./package')
 
 const NODE_ENV = process.env.NODE_ENV
 console.log('NODE_ENV', NODE_ENV)
@@ -16,6 +17,11 @@ function createWindow() {
       contextIsolation: false,
       preload: path.join(__dirname, 'preload.js')
     }
+  })
+
+  win.webContents.on('new-window', function (e, url) {
+    e.preventDefault()
+    require('electron').shell.openExternal(url)
   })
 
   NODE_ENV === 'development'
@@ -85,3 +91,11 @@ process.on('SIGINT', () => {
 process.on('SIGTERM', () => {
   handleTerminationSignals()
 })
+
+const feed = `https://update.moonman.sunquakes.com/electron/update-server/${process.platform}/${version}`
+
+autoUpdater.setFeedURL(feed)
+
+setInterval(() => {
+  autoUpdater.checkForUpdates()
+}, 10 * 1000)
